@@ -4,7 +4,8 @@
 
 class MyCar
 
-  attr_accessor :year, :colour, :model, :current_speed
+  attr_accessor :colour, :model, :current_speed
+  attr_reader :year
 
   def initialize(year, colour, model)
     @year = year
@@ -32,6 +33,11 @@ class MyCar
     puts "current speed is #{self.current_speed}"
   end
 
+  def spray_paint(new_colour)
+    p 'changing the colour!'
+    self.colour = new_colour
+  end
+
 end
 
 vauxhall = MyCar.new(2016, 'blue', 'vxr')
@@ -43,3 +49,8 @@ vauxhall.speed_up(30)
 vauxhall.check_speed
 vauxhall.shut_off
 vauxhall.check_speed
+
+vauxhall.spray_paint('red')
+p vauxhall.colour
+
+
