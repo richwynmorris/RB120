@@ -11,40 +11,39 @@ class Pet
 end
 
 class Owner
-  attr_reader :name
-  attr_accessor :total_pets
-  
-  @total_pets = 0
+  attr_accessor :pets, :name
   
   def initialize(name)
     @name = name
+    @pets = []
   end
   
   def number_of_pets
-    @total_pets
-  end
-  
-  def add_to_total
-    @total_pets += 1
-  end
-
-
-  def owners_pets
-    []
+    @pets.count
   end
     
 end
 
 class Shelter
+  attr_accessor :new_owner, :owners
+  
+  def initialize
+    @owners = {}
+  end
+  
   def adopt(new_owner, pet)
-    new_owner.add_to_total
-    new_owner.owners_pets << "a #{pet.type} named #{pet.name}"
+    @new_owner = new_owner
+    new_owner.pets << "a #{pet.type} named #{pet.name}"
+    @owners[new_owner.name] = new_owner
+    
   end
 
-  def print_adoptions
-    puts "#{new_owner} has adopted the following pets:"
-    puts pets
-  end
+   def print_adoptions
+     @owners.each do |name, object|
+       puts "#{object.name} has adopted the following pets:"
+       puts object.pets
+     end
+   end
 
 end
 
@@ -69,7 +68,7 @@ shelter.adopt(bholmes, kennedy)
 shelter.adopt(bholmes, sweetie)
 shelter.adopt(bholmes, molly)
 shelter.adopt(bholmes, chester)
-# shelter.print_adoptions
+shelter.print_adoptions
 puts "#{phanson.name} has #{phanson.number_of_pets} adopted pets."
 puts "#{bholmes.name} has #{bholmes.number_of_pets} adopted pets."
 
