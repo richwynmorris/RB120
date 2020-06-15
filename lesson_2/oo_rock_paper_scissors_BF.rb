@@ -72,7 +72,7 @@ class Scoreboard
 
   def update(player)
     @human_score += 1 if player.class == Human
-    @computer_score += 1 if player.class == Computer
+    @computer_score += 1 if player.class != Human
   end
 
   def display(human, computer)
@@ -82,7 +82,12 @@ class Scoreboard
   end
 
   def winner?
-    @human_score == 10 || @computer_score == 10
+    @human_score == 3 || @computer_score == 3
+  end
+  
+  def reset
+    @human_score = 0
+    @computer_score = 0
   end
 end
 
@@ -109,6 +114,11 @@ class Player
 
   def display_history
     puts "#{name} = #{move_history}"
+  end
+  
+  def reset_history
+    @move_history = []
+    @turn = 1
   end
 
 end
@@ -137,14 +147,53 @@ end
 
 # -------------------------------
 class Computer < Player
-  def set_name
-    self.name = ['C3PO', 'R2D2', 'WALL-E', 'Optimus Prime'].sample
-  end
+attr_accessor :name
+end
 
+# ------------------------------
+# Never chooses the same object twice in a row
+class R2D2 < Computer
+  def set_name
+    @name = 'R2D2'
+  end
+    
+  objects = 
+  
   def choose
-    self.move = OBJECTS.values.sample
+    p self.move
+    self.move = [Rock.new, Paper.new, Scissors.new, Spock.new, Lizard.new ].select {|object| object.class != self.move.class}.sample
     self.add_to_history
   end
+  
+end
+
+# ------------------------------
+# Always chooses between Spock and Lizard
+class Optimus_Prime < Computer
+  def set_name
+    @name = 'Optimus Prime'
+  end
+  
+  def choose
+    self.move = [Spock.new, Lizard.new].sample
+    self.add_to_history
+  end
+  
+end
+
+# ------------------------------
+# Always chooses a rock
+
+class WALL_E < Computer
+  def set_name
+    @name = 'WALL-E'
+  end
+  
+  def choose
+    self.move = Rock.new
+    self.add_to_history
+  end
+  
 end
 
 # ------------------------------
@@ -154,7 +203,7 @@ class RPSGame
 
   def initialize
     @human = Human.new
-    @computer = Computer.new
+    @computer = [R2D2.new ].sample #Optimus_Prime.new, WALL_E.new
     @scoreboard = Scoreboard.new
   end
 
@@ -171,12 +220,15 @@ class RPSGame
   def display_winner
     if human.move > computer.move
       puts "#{human.name} won!"
-      scoreboard.update(@human)
+      puts
+      scoreboard.update(human)
     elsif computer.move > human.move
       puts "#{computer.name} won!"
-      scoreboard.update(@computer)
+      puts
+      scoreboard.update(computer)
     else
       puts "It's a tie!"
+      puts
     end
   end
 
@@ -206,6 +258,15 @@ class RPSGame
     computer.display_history
     puts
   end
+  
+  def reset_scoreboard
+    scoreboard.reset
+  end
+  
+  def reset_history
+    human.reset_history
+    computer.reset_history
+  end
 
   def play
     display_greeting_message
@@ -213,7 +274,6 @@ class RPSGame
       loop do
         human.choose
         computer.choose
-        system 'clear'
         display_moves
         display_winner
         display_scoreboard
@@ -221,7 +281,11 @@ class RPSGame
         break if scoreboard.winner?
       end
       break unless play_again?
+      reset_scoreboard
+      reset_history
+      system 'clear'
     end
+    system 'clear'
     display_goodbye_message
   end
 end
