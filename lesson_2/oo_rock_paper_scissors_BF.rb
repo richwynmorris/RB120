@@ -89,16 +89,28 @@ end
 # -------------------------------
 
 class Player
-  attr_accessor :move, :name
+  attr_accessor :move, :name, :move_history, :turn
 
   def initialize
     @move = nil
     set_name
+    @move_history = []
+    @turn = 1
   end
 
   OBJECTS = { 'rock' => Rock.new, 'paper' => Paper.new,
               'scissors' => Scissors.new, 'spock' => Spock.new,
               'lizard' => Lizard.new }
+
+  def add_to_history
+    move_history << "Turn #{turn}: #{move}"
+    @turn += 1
+  end
+
+  def display_history
+    puts "#{name} = #{move_history}"
+  end
+
 end
 
 # ------------------------------
@@ -119,6 +131,7 @@ class Human < Player
       puts "Sorry, Invalid choice. Please try again."
     end
     self.move = OBJECTS[choice]
+    self.add_to_history
   end
 end
 
@@ -130,6 +143,7 @@ class Computer < Player
 
   def choose
     self.move = OBJECTS.values.sample
+    self.add_to_history
   end
 end
 
@@ -186,15 +200,24 @@ class RPSGame
     scoreboard.display(human.name, computer.name)
   end
 
+  def display_histories
+    human.display_history
+    puts
+    computer.display_history
+    puts
+  end
+
   def play
     display_greeting_message
     loop do
       loop do
         human.choose
         computer.choose
+        system 'clear'
         display_moves
         display_winner
         display_scoreboard
+        display_histories
         break if scoreboard.winner?
       end
       break unless play_again?
