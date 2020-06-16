@@ -156,11 +156,8 @@ class R2D2 < Computer
   def set_name
     @name = 'R2D2'
   end
-    
-  objects = 
   
   def choose
-    p self.move
     self.move = [Rock.new, Paper.new, Scissors.new, Spock.new, Lizard.new ].select {|object| object.class != self.move.class}.sample
     self.add_to_history
   end
