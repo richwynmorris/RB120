@@ -84,7 +84,7 @@ class Scoreboard
   def winner?
     @human_score == 3 || @computer_score == 3
   end
-  
+
   def reset
     @human_score = 0
     @computer_score = 0
@@ -115,21 +115,22 @@ class Player
   def display_history
     puts "#{name} = #{move_history}"
   end
-  
+
   def reset_history
     @move_history = []
     @turn = 1
   end
-
 end
 
 # ------------------------------
 
 class Human < Player
   def set_name
-    puts "What's your name human?"
+    system 'clear'
+    puts "What's your name, human?"
     answer = gets.chomp
     self.name = answer
+    system 'clear'
   end
 
   def choose
@@ -142,12 +143,13 @@ class Human < Player
     end
     self.move = OBJECTS[choice]
     self.add_to_history
+    system 'clear'
   end
 end
 
 # -------------------------------
 class Computer < Player
-attr_accessor :name
+  attr_accessor :name
 end
 
 # ------------------------------
@@ -156,43 +158,41 @@ class R2D2 < Computer
   def set_name
     @name = 'R2D2'
   end
-  
+
   def choose
-    self.move = [Rock.new, Paper.new, Scissors.new, Spock.new, Lizard.new ].select {|object| object.class != self.move.class}.sample
+    self.move = OBJECTS.values.select do |object|
+      object.class != self.move.class
+    end.sample
+
     self.add_to_history
   end
-  
 end
 
 # ------------------------------
 # Always chooses between Spock and Lizard
-class Optimus_Prime < Computer
+class OptimusPrime < Computer
   def set_name
     @name = 'Optimus Prime'
   end
-  
+
   def choose
     self.move = [Spock.new, Lizard.new].sample
     self.add_to_history
   end
-  
 end
-
 # ------------------------------
 # Always chooses a rock
 
-class WALL_E < Computer
+class WallE < Computer
   def set_name
     @name = 'WALL-E'
   end
-  
+
   def choose
     self.move = Rock.new
     self.add_to_history
   end
-  
 end
-
 # ------------------------------
 
 class RPSGame
@@ -200,36 +200,38 @@ class RPSGame
 
   def initialize
     @human = Human.new
-    @computer = [R2D2.new ].sample #Optimus_Prime.new, WALL_E.new
+    @computer = [OptimusPrime.new, R2D2.new, WallE.new].sample
     @scoreboard = Scoreboard.new
   end
 
   def display_greeting_message
-    "Welcome to Rock, Paper, Scissors, Spock, Lizard."
+    puts "Welcome to Rock, Paper, Scissors, Spock, Lizard."
+    sleep 2
+    system 'clear'
   end
 
   def display_moves
     puts "You chose: #{human.move}"
     puts "#{computer.name} chose: #{computer.move}"
-    puts
+    sleep 2
+    system 'clear'
   end
 
   def display_winner
+    winner = nil
     if human.move > computer.move
-      puts "#{human.name} won!"
-      puts
-      scoreboard.update(human)
+      winner = human
     elsif computer.move > human.move
-      puts "#{computer.name} won!"
-      puts
-      scoreboard.update(computer)
+      winner = computer
     else
-      puts "It's a tie!"
-      puts
+      return puts "It's a tie!"
     end
+    scoreboard.update(winner)
+    puts "#{winner.name} won!"
   end
 
   def display_goodbye_message
+    system 'clear'
     puts "Thank you for playing, #{human.name}. Goodbye!"
   end
 
@@ -255,34 +257,35 @@ class RPSGame
     computer.display_history
     puts
   end
-  
-  def reset_scoreboard
+
+  def reset
     scoreboard.reset
-  end
-  
-  def reset_history
     human.reset_history
     computer.reset_history
+    system 'clear'
+  end
+
+  def game_round
+    human.choose
+    computer.choose
+    display_moves
+    display_winner
+    display_scoreboard
+    display_histories
+    sleep 4
+    system 'clear'
   end
 
   def play
     display_greeting_message
     loop do
       loop do
-        human.choose
-        computer.choose
-        display_moves
-        display_winner
-        display_scoreboard
-        display_histories
+        game_round
         break if scoreboard.winner?
       end
       break unless play_again?
-      reset_scoreboard
-      reset_history
-      system 'clear'
+      reset
     end
-    system 'clear'
     display_goodbye_message
   end
 end
