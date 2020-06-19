@@ -16,5 +16,5 @@ end
 # In the make_one_year_older method we have used self. What is another way we could write this method so we don't have to use the self prefix?
 
   def make_one_year_older
-    age += 1
+    @age += 1
   end
