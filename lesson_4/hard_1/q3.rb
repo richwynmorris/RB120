@@ -62,6 +62,7 @@ class Catamaran
     @hull_count = num_hulls
     fuel_and_capacity(km_traveled_per_liter, liters_of_fuel_capacity)
   end
+
 end
 
 class MotorBoat < Catamaran
