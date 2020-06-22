@@ -13,6 +13,43 @@
 # - marks
 # - plays
 
+class Scoreboard
+  attr_reader :human_score, :computer_score
+
+  def initialize
+    @human_score = 0
+    @computer_score = 0
+  end
+
+  def update(marker)
+    if marker == TTTGame::HUMAN_MARKER
+      @human_score += 1
+    elsif marker == TTTGame::COMPUTER_MARKER
+      @computer_score += 1
+    end
+  end
+
+  def reset
+    @human_score = 0
+    @computer_score = 0
+  end
+
+  def display
+    spaces = ' ' * 11
+    puts "********************************************"
+    puts "*               SCOREBOARD                 *"
+    puts "*#{spaces}HUMAN: #{human_score} COMPUTER: #{computer_score}#{spaces}*"
+    puts "*                                          *"
+    puts "********************************************"
+  end
+
+  def winner?
+    @human_score == 5 || @computer_score == 5
+  end
+
+
+end
+
 class Board
   WINNING_CONDITIONS = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] + # rows
                        [[1, 4, 7], [2, 5, 8], [3, 6, 9]] + # cols
@@ -42,6 +79,10 @@ class Board
     PRINT_BOARD
   end
 
+  def [](square)
+    @squares[square].marker
+  end
+
   def []=(square, marker)
     @squares[square].marker = marker
   end
@@ -60,7 +101,7 @@ class Board
 
   def winning_marker
     WINNING_CONDITIONS.each do |line|
-      squares = @squares.values_at(*line)
+      squares = check_squares(line)
       if three_identical_markers?(squares)
         return squares.first.marker
       end
@@ -72,12 +113,33 @@ class Board
     (1..9).each { |key| @squares[key] = Square.new }
   end
 
+  def threat_or_opportunity?(marker)
+    WINNING_CONDITIONS.each do |line|
+      squares = check_squares(line)
+      markers = get_markers(squares)
+      if markers.count(marker) == 2
+        squares.each_with_index do |square, index|
+          return line[index] if square.unmarked?
+        end
+      end
+    end
+    nil
+  end
+
   private
 
   def three_identical_markers?(squares)
-    markers = squares.select(&:marked?).collect(&:marker)
+    markers = get_markers(squares)
     return false if markers.size != 3
     markers.min == markers.max
+  end
+
+  def check_squares(line)
+    @squares.values_at(*line)
+  end
+
+  def get_markers(squares)
+    squares.select(&:marked?).collect(&:marker)
   end
 end
 
@@ -91,7 +153,7 @@ class Square
   end
 
   def to_s
-    @marker
+    marker
   end
 
   def unmarked?
@@ -101,6 +163,7 @@ class Square
   def marked?
     marker != INITIAL_MARKER
   end
+
 end
 
 class Player
@@ -116,13 +179,14 @@ class TTTGame
   COMPUTER_MARKER = 'O'
   FIRST_TO_MOVE = HUMAN_MARKER
 
-  attr_reader :board, :human, :marker, :computer
+  attr_reader :board, :human, :marker, :computer, :scoreboard
 
   def initialize
     @board = Board.new
     @human = Player.new(HUMAN_MARKER)
     @computer = Player.new(COMPUTER_MARKER)
     @current_marker = FIRST_TO_MOVE
+    @scoreboard = Scoreboard.new
   end
 
   def play
@@ -173,8 +237,17 @@ class TTTGame
     end
   end
 
+  def join_or
+    if board.unmarked_keys.length == 1
+      board.unmarked_keys.last.to_s
+    else
+      "#{board.unmarked_keys[0..-2].join(', ')} or #{board.unmarked_keys.
+      last.to_s}"
+    end
+  end
+
   def human_moves
-    puts "Choose a square: #{board.unmarked_keys.join(', ')}."
+    puts "Choose a square: " + join_or
     square = nil
     loop do
       square = gets.chomp.to_i
@@ -185,7 +258,19 @@ class TTTGame
   end
 
   def computer_moves
-    board[board.unmarked_keys.sample] = computer.marker
+    potential_win = board.threat_or_opportunity?(computer.marker)
+    potential_loss = board.threat_or_opportunity?(human.marker)
+
+    if potential_win
+      board[potential_win] = computer.marker
+    elsif potential_loss
+      board[potential_loss] = computer.marker
+    elsif board[5] == Square::INITIAL_MARKER
+      board[5] = computer.marker
+    else
+     board[board.unmarked_keys.sample] = computer.marker
+    end
+    
   end
 
   def current_player_moves
@@ -209,7 +294,20 @@ class TTTGame
     else
       puts "It's a tie!"
     end
+
+    sleep 4
   end
+
+  def update_scoreboard
+    scoreboard.update(board.winning_marker)
+  end
+
+  def display_scoreboard
+    clear
+    scoreboard.display
+    sleep 4
+  end
+
 
   def main_game
     loop do
@@ -217,9 +315,21 @@ class TTTGame
       player_move
       clear
       display_result
-      break unless play_again?
+      update_scoreboard
+      display_scoreboard
+      break if winner?
       reset
+    end
+    another_round?
+  end
+
+  def another_round?
+    reset
+    scoreboard.reset
+    if play_again?
+      clear
       display_play_again_message
+      main_game
     end
   end
 
@@ -245,6 +355,11 @@ class TTTGame
     puts "Let's play again!"
     puts ''
   end
+
+  def winner?
+    scoreboard.winner?
+  end
+
 end
 
 game = TTTGame.new
