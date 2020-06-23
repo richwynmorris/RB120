@@ -42,7 +42,6 @@ class Scoreboard
     puts "*                                          *"
     puts "********************************************"
     sleep 3
-    clear
   end
 
   def winner?
@@ -195,7 +194,7 @@ end
 class TTTGame
   HUMAN_MARKER = 'X'
   COMPUTER_MARKER = 'O'
-  GRAND_WINNER = 5
+  GRAND_WINNER = 1
 
   attr_reader :board, :human, :marker, :computer, :scoreboard
 
@@ -224,7 +223,7 @@ class TTTGame
   def display_greeting_message
     puts "Welcome to Tic-Tac-Toe!"
     puts
-    sleep 4
+    sleep 3
   end
 
   def display_goodbye_message
@@ -243,7 +242,7 @@ class TTTGame
 
   def display_board
     puts
-    puts "You're an #{human.marker}. #{computer.name} is a #{computer.marker}"
+    puts "You're an #{human.marker}. #{computer.name} is a #{computer.marker}."
     puts
     board.draw
     puts
@@ -256,7 +255,7 @@ class TTTGame
 
   def display_grand_winner
     spaces = ' ' * 10
-    spaces_name = ' ' * ((32 - winner.length) / 2)
+    spaces_name = ' ' * ((32 - @winner.length) / 2)
     full_spaces = ' ' * 32
     line = '*' * 34
     puts <<~DISPLAY_WINNER
@@ -310,11 +309,11 @@ class TTTGame
   end
 
   def defend!
-    board[potential_loss] = computer.marker
+    board[potential_loss?] = computer.marker
   end
 
   def attack!
-    board[potential_win] = computer.marker
+    board[potential_win?] = computer.marker
   end
 
   def computer_moves
@@ -370,6 +369,7 @@ class TTTGame
   end
 
   def main_game
+    clear
     go_first?
     loop do
       display_board
@@ -378,6 +378,12 @@ class TTTGame
       break if winner?
       reset
     end
+    end_game
+  end
+
+  def end_game
+    who_won?
+    clear
     display_grand_winner
     another_round?
   end
@@ -426,6 +432,7 @@ class TTTGame
   def ask_player_name
     puts "What's your name, human?"
     answer = gets.chomp
+    answer << ' ' if answer.length.odd?
     human.name = answer
     sleep 2
     clear
