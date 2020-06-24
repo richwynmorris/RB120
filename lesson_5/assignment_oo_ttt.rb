@@ -213,6 +213,18 @@ class Human < Player
     super(marker)
     @name = nil
   end
+
+  def get_player_name
+    puts "What's your name, human?"
+    answer = nil
+    loop do
+      answer = gets.chomp
+      break if !answer.split.all?(' ')
+      puts "Sorry, that's not a valid name. Include at least one character."
+    end
+    answer << ' ' if answer.length.odd?
+    @name = answer
+  end
 end
 
 class Computer < Player
@@ -227,7 +239,7 @@ end
 class TTTGame
   HUMAN_MARKER = 'X'
   COMPUTER_MARKER = 'O'
-  GRAND_WINNER = 3
+  GRAND_WINNER = 1
 
   attr_reader :board, :human, :marker, :computer, :scoreboard
 
@@ -244,7 +256,7 @@ class TTTGame
   def play
     clear
     display_greeting_message
-    ask_player_name
+    human.get_player_name
     greet_player
     main_game
     display_goodbye_message
@@ -427,22 +439,11 @@ class TTTGame
   end
 
   def greet_player
+    clear
     puts "Good to meet you, #{human.name}! Let's play!"
     sleep 2
   end
 
-  def ask_player_name
-    puts "What's your name, human?"
-    answer = nil
-    loop do
-      answer = gets.chomp
-      break if !answer.split.all?(' ')
-      puts "Sorry, that's not a valid name. Include at least one character."
-    end
-    answer << ' ' if answer.length.odd?
-    human.name = answer
-    clear
-  end
 end
 
 game = TTTGame.new
