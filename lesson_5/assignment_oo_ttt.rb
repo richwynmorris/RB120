@@ -1,19 +1,62 @@
-# Write up:
-# Tic-tac-toe is a two player board game set on a 3X3 grid. Players take turns
-# marking a square. The first player to mark 3 squares in a row wins.
+module Displayable
+  def display_greeting_message
+    puts "Welcome to Tic-Tac-Toe!"
+    puts
+    sleep 1
+  end
 
-# Nouns: player, board, grid, square,
-# Verbs: mark, play
+  def display_goodbye_message
+    clear
+    puts "Thanks for playing Tic-Tac-Toe, #{human.name}! Goodbye!"
+  end
 
-# (board and grid as refering to the same object.)
+  def display_play_again_message
+    puts "Let's play again!"
+    puts ''
+  end
 
-# Board
-# Square
-# Player
-# - marks
-# - plays
+  def display_grand_winner
+    spaces = ' ' * 10
+    spaces_name = ' ' * ((32 - @winner.length) / 2)
+    full_spaces = ' ' * 32
+    line = '*' * 34
+    puts <<~DISPLAY_WINNER
+    #{line}
+    *#{spaces}GRAND WINNER#{spaces}*
+    *#{spaces_name}#{@winner}#{spaces_name}*
+    *#{full_spaces}*
+    #{line}
+    DISPLAY_WINNER
+    sleep 4
+  end
+
+  def display_result
+    clear_screen_and_display_board
+
+    case board.winning_marker
+    when TTTGame::HUMAN_MARKER
+      puts "You won!"
+    when TTTGame::COMPUTER_MARKER
+      puts "#{computer.name} won!"
+    else
+      puts "It's a tie!"
+    end
+    sleep 4
+  end
+
+  def display
+    spaces = ' ' * 11
+    puts "********************************************"
+    puts "*               SCOREBOARD                 *"
+    puts "*#{spaces}HUMAN: #{human_score} COMPUTER: #{computer_score}#{spaces}*"
+    puts "*                                          *"
+    puts "********************************************"
+  end
+end
 
 class Scoreboard
+  include Displayable
+
   attr_reader :human_score, :computer_score
 
   def initialize
@@ -34,16 +77,6 @@ class Scoreboard
     @computer_score = 0
   end
 
-  def display
-    spaces = ' ' * 11
-    puts "********************************************"
-    puts "*               SCOREBOARD                 *"
-    puts "*#{spaces}HUMAN: #{human_score} COMPUTER: #{computer_score}#{spaces}*"
-    puts "*                                          *"
-    puts "********************************************"
-    sleep 3
-  end
-
   def winner?
     @human_score == TTTGame::GRAND_WINNER ||
       @computer_score == TTTGame::GRAND_WINNER
@@ -51,9 +84,9 @@ class Scoreboard
 end
 
 class Board
-  WINNING_CONDITIONS = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] + # rows
-                       [[1, 4, 7], [2, 5, 8], [3, 6, 9]] + # cols
-                       [[1, 5, 9], [3, 5, 7]] # diags
+  WINNING_CONDITIONS = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] +
+                       [[1, 4, 7], [2, 5, 8], [3, 6, 9]] +
+                       [[1, 5, 9], [3, 5, 7]]
 
   INITIAL_MARKER = ' '
 
@@ -113,7 +146,7 @@ class Board
     (1..9).each { |key| @squares[key] = Square.new }
   end
 
-  def threat_or_opportunity?(marker)
+  def threat_or_opportunity(marker)
     WINNING_CONDITIONS.each do |line|
       squares = check_squares(line)
       markers = get_markers(squares)
@@ -194,9 +227,11 @@ end
 class TTTGame
   HUMAN_MARKER = 'X'
   COMPUTER_MARKER = 'O'
-  GRAND_WINNER = 1
+  GRAND_WINNER = 3
 
   attr_reader :board, :human, :marker, :computer, :scoreboard
+
+  include Displayable
 
   def initialize
     @board = Board.new
@@ -210,6 +245,7 @@ class TTTGame
     clear
     display_greeting_message
     ask_player_name
+    greet_player
     main_game
     display_goodbye_message
   end
@@ -218,17 +254,6 @@ class TTTGame
 
   def clear
     system 'clear'
-  end
-
-  def display_greeting_message
-    puts "Welcome to Tic-Tac-Toe!"
-    puts
-    sleep 3
-  end
-
-  def display_goodbye_message
-    clear
-    puts "Thanks for playing Tic-Tac-Toe, #{human.name}! Goodbye!"
   end
 
   def clear_screen_and_display_board
@@ -248,24 +273,9 @@ class TTTGame
     puts
   end
 
-  def who_won?
+  def return_winner
     @winner = human.name if scoreboard.human_score == GRAND_WINNER
     @winner = computer.name if scoreboard.computer_score == GRAND_WINNER
-  end
-
-  def display_grand_winner
-    spaces = ' ' * 10
-    spaces_name = ' ' * ((32 - @winner.length) / 2)
-    full_spaces = ' ' * 32
-    line = '*' * 34
-    puts <<~DISPLAY_WINNER
-    #{line}
-    *#{spaces}GRAND WINNER#{spaces}*
-    *#{spaces_name}#{@winner}#{spaces_name}*
-    *#{full_spaces}*
-    #{line}
-    DISPLAY_WINNER
-    sleep 4
   end
 
   def player_move
@@ -289,19 +299,20 @@ class TTTGame
     puts "Choose a square: " + join_or
     square = nil
     loop do
-      square = gets.chomp.to_i
-      break if board.unmarked_keys.include?(square)
+      square = gets.chomp
+      break if board.unmarked_keys.include?(square.to_i) &&
+               square != square.to_f.to_s
       puts "Sorry that's not a valid answer. Try again."
     end
-    board[square] = human.marker
+    board[square.to_i] = human.marker
   end
 
   def potential_win?
-    board.threat_or_opportunity?(computer.marker)
+    board.threat_or_opportunity(computer.marker)
   end
 
   def potential_loss?
-    board.threat_or_opportunity?(human.marker)
+    board.threat_or_opportunity(human.marker)
   end
 
   def select_centre
@@ -338,20 +349,6 @@ class TTTGame
     end
   end
 
-  def display_result
-    clear_screen_and_display_board
-
-    case board.winning_marker
-    when HUMAN_MARKER
-      puts "You won!"
-    when COMPUTER_MARKER
-      puts "#{computer.name} won!"
-    else
-      puts "It's a tie!"
-    end
-    sleep 4
-  end
-
   def scoreboard_and_results
     display_result
     update_scoreboard
@@ -365,7 +362,7 @@ class TTTGame
   def display_scoreboard
     clear
     scoreboard.display
-    sleep 4
+    sleep 2
   end
 
   def main_game
@@ -382,7 +379,7 @@ class TTTGame
   end
 
   def end_game
-    who_won?
+    return_winner
     clear
     display_grand_winner
     another_round?
@@ -413,31 +410,38 @@ class TTTGame
     clear
   end
 
-  def display_play_again_message
-    puts "Let's play again!"
-    puts ''
-  end
-
   def winner?
     scoreboard.winner?
   end
 
   def go_first?
+    answer = nil
     puts "Would you like to go first, #{human.name}? (y/n)"
-    answer = gets.chomp.downcase
-    @current_marker = HUMAN_MARKER if ['yes', 'y'].include?(answer)
+    loop do
+      answer = gets.chomp.downcase
+      break if ['y', 'n'].include?(answer)
+      puts "Sorry, you need to choose either y or n."
+    end
+    @current_marker = HUMAN_MARKER if answer == 'y'
     clear
+  end
+
+  def greet_player
+    puts "Good to meet you, #{human.name}! Let's play!"
+    sleep 2
   end
 
   def ask_player_name
     puts "What's your name, human?"
-    answer = gets.chomp
+    answer = nil
+    loop do
+      answer = gets.chomp
+      break if !answer.split.all?(' ')
+      puts "Sorry, that's not a valid name. Include at least one character."
+    end
     answer << ' ' if answer.length.odd?
     human.name = answer
-    sleep 2
     clear
-    puts "Good to meet you, #{human.name}! Let's play!"
-    sleep 2
   end
 end
 
