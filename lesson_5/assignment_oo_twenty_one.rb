@@ -48,31 +48,37 @@ class Participant
   end
 
   def hit(deck)
+    system 'clear'
     hand << deck.top_card
     puts "#{name} hits!"
-    puts
     sleep 2
   end
 
   def stick
+    system 'clear'
     puts "#{name} stuck!"
+    sleep 2
   end
 
   def display_busted
-    puts "Too bad! #{name} busted!"
+    show_cards
+    total
+    sleep 2
+    system 'clear'
+    puts "#{name} busted!"
   end
 
   def busted?
-    calculate_total
+    get_total
     @total_hand > Game::WINNING_CONDITION
   end
 
   def total
-    calculate_total
-    puts "Your total is #{total_hand}"
+    get_total
+    puts "#{name}'s total is #{total_hand}"
   end
 
-  def calculate_total
+  def get_total
     reset_total_hand
     hand.each do |card|
       if card.value == 'Ace' 
@@ -87,7 +93,10 @@ class Participant
   end
 
   def check_aces
-    hand.flatten.count('Ace').times do
+    aces = hand.count do |card|
+            card.value == "Ace"
+           end
+    aces.times do
       @total_hand -= 10 if total_hand > Game::WINNING_CONDITION
     end
   end
@@ -95,44 +104,47 @@ class Participant
   def reset_total_hand
     @total_hand = 0
   end
+
+  def show_cards
+    system 'clear'
+    puts "#{name}'s cards: #{hand.join(', ')}"
+  end
+
 end
 
 class Player < Participant
-  attr_accessor :hand, :name
+  attr_accessor :hand, :name, :choice
 
   def initialize
     super
     @name = name
-  end
-  
-  def show_cards
-    puts "Your cards: #{hand.join(', ')}"
-    sleep 2
+    @choice = nil
   end
 
   def hit_or_stick(deck)
     puts "Hit or stick?"
-    answer = nil
     loop do
-      answer = gets.chomp.downcase
-      break if ['hit', 'stick', 'h', 's'].include?(answer)
+      @choice = gets.chomp.downcase
+      break if ['hit', 'stick', 'h', 's'].include?(choice)
       puts "Sorry, that's not a valid answer. Try again."
     end
-
-    return 'stick' if answer != 'hit'
-
-    hit(deck)
+    if choice == 'hit'
+      hit(deck)
+    elsif choice == 'stick'
+      stick
+    end
   end
 
 end
 
 class Dealer < Participant
 
-  attr_reader :name
+  attr_reader :name, :choice
 
   def initialize
     super
     @name = 'Dealer'
+    @choice = nil
   end
 
   def deal_initial_cards(player, deck)
@@ -143,15 +155,12 @@ class Dealer < Participant
   end
 
   def hit_or_stick(deck)
-    loop do
-      hit(deck) if total_hand < 17
-        
-      if busted?
-        break
-      elsif total_hand > 17
-        stick && break
-      end
-
+    if total_hand < 17
+      @choice = 'hit'
+      hit(deck)
+    elsif total_hand > 17 && total_hand <= Game::WINNING_CONDITION
+      @choice = 'stick'
+      stick
     end
   end
 
@@ -278,7 +287,7 @@ class Game
   end
 
   def display_busted(participent)
-    participent.display_busted
+    participent.display_busted if busted?(participent)
   end
 
   def hit_or_stick_player
@@ -293,25 +302,28 @@ class Game
     participent.busted?
   end
 
+  def stick?(participent)
+    participent.choice == 'stick'
+  end
+
   def player_turn
     loop do
+      clear
       show_cards
       show_total
+      sleep 2
       hit_or_stick_player
-      break if busted?(player)
+      break if stick?(player) || busted?(player)
     end
-    if busted?(player)
-      display_busted
-    else
-      player.stick
-    end
+    display_busted(player)  
   end
 
   def dealer_turn
     loop do
       hit_or_stick_dealer
-      break if busted?(dealer)
+      break if stick?(dealer) || busted?(dealer)
     end
+    display_busted(dealer)
   end
 
   def main_game
@@ -321,8 +333,10 @@ class Game
       break if busted?(player)
       dealer_turn
       break if busted?(dealer)
-      puts 'You got here!'
+      break
+      #show_result
     end
+    play_again?
   end
   
   def start
