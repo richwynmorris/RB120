@@ -167,7 +167,7 @@ class Dealer < Participant
       hit(deck)
       display_hit
       clear
-      sleep 2
+      sleep 1
     elsif total_hand >= 17 && total_hand <= Game::WINNING_CONDITION
       @choice = 's'
       display_stick
@@ -255,7 +255,12 @@ class Game
 
   def assign_name
     puts "What's your name, stranger?"
-    answer = gets.chomp
+    answer = ''
+    loop do
+      answer = gets.chomp
+      break unless answer.empty?
+      "Sorry, I need a valid name."
+    end
     player.name = answer
     clear
   end
