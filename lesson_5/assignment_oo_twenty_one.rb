@@ -1,47 +1,41 @@
-# Write up
+class Scoreboard
+  attr_accessor :player_score, :dealer_score
 
-# 21 is a game consisting of a dealer and a player. where the 
-# participents try to get as close to 21 without going over.
+  def initialize
+    @player_score = 0
+    @dealer_score = 0
+  end
 
-# Overview:
-# Both players are initially dealt 2 cards from a deck of 52 cards.
-# The player takes the first turn and can either 'stick' or 'hit'.
-# If the player busts, he loses. If he sticks it is the dealers turn.
-# The dealer must hit until his cards either match or exceed the value of 17.
-# If he busts, the player wins. 
-# if both the player and the dealer stick, the player with the highest total wins.
-# If both totals are the same, it is a tie and nobody wins. 
+  def update(participent)
+    if participent.class == Player
+      @player_score += 1
+    elsif participent.class == Dealer
+      @dealer_score += 1
+    end
+  end
 
-# Nouns: participent, player, dealer, deck, cards, game, total
-# Verbs: deal, hit, stick, busts, 
+  def display
+    spaces = ' ' * 11
+    puts "********************************************"
+    puts "*               SCOREBOARD                 *"
+    puts "*#{spaces}Player: #{player_score} Dealer: #{dealer_score}#{spaces} *"
+    puts "*                                          *"
+    puts "********************************************"
+  end
 
-# States:
-# Player:
-# - hit
-# - stick 
-# - busted?
-# - total
+  def check_for_winner
+    player_score == Game::ROUNDS || dealer_score == Game::ROUNDS
+  end
 
-# Dealer:
-# = hit
-# - stick
-# - busted?
-# - total
-# - deal
-
-# Participent
-
-# Deck
-# - deal (should this be here or in dealer?)
-
-# Card
-
-# Game
-# - start
+  def reset
+    @player_score = 0
+    @dealer_score = 0
+  end
+end
 
 class Participant
   attr_accessor :hand, :total_hand
-  
+
   def initialize
     @hand = []
     @total_hand = 0
@@ -52,60 +46,61 @@ class Participant
   end
 
   def hit(deck)
-    clear
     hand << deck.top_card
+  end
+
+  def display_hit
+    clear
     puts "#{name} hits!"
     sleep 2
   end
 
-  def stick
+  def display_stick
     clear
     puts "#{name} stuck!"
     sleep 2
   end
 
-  def display_busted    
+  def display_busted
     clear
-    puts "#{name} busted!"    
+    puts "#{name} busted!"
     sleep 2
+    puts
     show_cards
     total
-    sleep 2
+    sleep 4
     clear
   end
 
   def busted?
-    get_total
+    reset_total_hand
+    calculate_total
     @total_hand > Game::WINNING_CONDITION
   end
 
   def show_cards
-    puts "#{name}'s cards: #{hand.join(', ')}"
+    puts "#{name}'s cards: #{hand.join(', ')}."
   end
 
   def total
-    get_total
+    reset_total_hand
+    calculate_total
     puts "#{name}'s total is #{total_hand}"
   end
 
-  def get_total
-    reset_total_hand
+  def calculate_total
     hand.each do |card|
-      if card.value == 'Ace' 
-        @total_hand += 11
-      elsif ['Jack', 'Queen', 'King'].include?(card.value)
-        @total_hand += 10 
-      else
-        @total_hand += card.value
-      end
+      @total_hand += 11 if card.value == 'Ace'
+      @total_hand += 10 if ['Jack', 'Queen', 'King'].include?(card.value)
+      @total_hand += card.value if (2..9).to_a.include?(card.value)
     end
     check_aces
   end
 
   def check_aces
     aces = hand.count do |card|
-            card.value == "Ace"
-           end
+      card.value == "Ace"
+    end
     aces.times do
       @total_hand -= 10 if total_hand > Game::WINNING_CONDITION
     end
@@ -130,24 +125,27 @@ class Player < Participant
     @choice = nil
   end
 
-  def hit_or_stick(deck)
-    puts "Hit or stick?"
+  def assign_player_choice
     loop do
       @choice = gets.chomp.downcase
-      break if ['hit', 'stick', 'h', 's'].include?(choice)
+      break if ['h', 's'].include?(choice)
       puts "Sorry, that's not a valid answer. Try again."
-    end
-    if choice == 'hit'
-      hit(deck)
-    elsif choice == 'stick'
-      stick
     end
   end
 
+  def hit_or_stick(deck)
+    puts "Hit or stick? h for hit, s for stick"
+    assign_player_choice
+    if choice == 'h'
+      hit(deck)
+      display_hit
+    elsif choice == 's'
+      display_stick
+    end
+  end
 end
 
 class Dealer < Participant
-
   attr_reader :name, :choice
 
   def initialize
@@ -157,7 +155,7 @@ class Dealer < Participant
   end
 
   def deal_initial_cards(player, deck)
-    2.times do 
+    2.times do
       player.hand << deck.top_card
       hand << deck.top_card
     end
@@ -165,14 +163,16 @@ class Dealer < Participant
 
   def hit_or_stick(deck)
     if total_hand < 17
-      @choice = 'hit'
+      @choice = 'h'
       hit(deck)
-    elsif total_hand > 17 && total_hand <= Game::WINNING_CONDITION
-      @choice = 'stick'
-      stick
+      display_hit
+      clear
+      sleep 2
+    elsif total_hand >= 17 && total_hand <= Game::WINNING_CONDITION
+      @choice = 's'
+      display_stick
     end
   end
-
 end
 
 class Deck
@@ -184,7 +184,7 @@ class Deck
   end
 
   def top_card
-    @remaining_cards.reject! { |_, v| v == []}
+    @remaining_cards.reject! { |_, v| v == [] }
     suit = remaining_cards.keys.sample
     value = remaining_cards[suit].sample
     @card = Card.new(suit, value)
@@ -197,22 +197,25 @@ class Deck
   end
 
   def reset
-    @remaining_cards = { 'Hearts': ['Ace', 2, 3, 4, 5, 6, 7, 8, 9, 'Jack', 'Queen', 'King'],
-                         'Spades': ['Ace', 2, 3, 4, 5, 6, 7, 8, 9, 'Jack', 'Queen', 'King'],
-                         'Diamonds': ['Ace', 2, 3, 4, 5, 6, 7, 8, 9, 'Jack', 'Queen', 'King'],
-                         'Clubs': ['Ace', 2, 3, 4, 5, 6, 7, 8, 9, 'Jack', 'Queen', 'King'] }
-
+    @remaining_cards = { 'Hearts': ['Ace', 2, 3, 4, 5, 6, 7, 8, 9, 'Jack',
+                                    'Queen', 'King'],
+                         'Spades': ['Ace', 2, 3, 4, 5, 6, 7, 8, 9, 'Jack',
+                                    'Queen', 'King'],
+                         'Diamonds': ['Ace', 2, 3, 4, 5, 6, 7, 8, 9, 'Jack',
+                                      'Queen', 'King'],
+                         'Clubs': ['Ace', 2, 3, 4, 5, 6, 7, 8, 9, 'Jack',
+                                   'Queen', 'King'] }
   end
 end
 
 class Card
   attr_accessor :suit, :value
-  
+
   def initialize(suit, value)
     @suit = suit
     @value = value
   end
-  
+
   def to_s
     "The #{value} of #{suit}"
   end
@@ -222,12 +225,14 @@ class Game
   ROUNDS = 5
   WINNING_CONDITION = 21
 
-  attr_accessor :deck, :player, :dealer
+  attr_accessor :deck, :player, :dealer, :winner, :scoreboard, :grand_winner
 
   def initialize
     @deck = Deck.new
     @player = Player.new
     @dealer = Dealer.new
+    @scoreboard = Scoreboard.new
+    @grand_winner = nil
   end
 
   def clear
@@ -235,59 +240,62 @@ class Game
   end
 
   def introduction
-    greeting
-    get_name
+    welcome
+    assign_name
+    greet_player
     instructions
   end
-  
-  def greeting
+
+  def welcome
     clear
     puts "Welcome to the Twenty One Game! Let's get started!"
     sleep 2
     clear
   end
 
-  def get_name
+  def assign_name
     puts "What's your name, stranger?"
     answer = gets.chomp
     player.name = answer
     clear
+  end
+
+  def greet_player
     puts "Nice to meet you, #{player.name}!"
     sleep 2
     clear
   end
 
+  # rubocop:disable Metrics/MethodLength
   def instructions
-    puts <<-text
+    puts <<-TEXT
     ** ENTER 'S' TO SKIP RULES **
 
     The Rules:
-
     The objective of twenty one is to get the highest collective value of
     cards without going over the number of twenty one.
 
     Jack, Queen and King are equal to 10 and Ace can be either 1 or 11.
 
     You, and the dealer, will be dealt 2 cards at the start of the round.
-
     You can either 'stick' with your current total or 'hit' to add another
     card. 
 
     Once you 'stick' you cannot add another card. It's then the dealers
     turn to stick or hit.
 
-    But, if your total goes over 21, you 'bust' and lose the game.
+    If your total goes over 21, you 'bust' and lose the game.
 
-    Once both players have stuck with their hands,both sides reveal their cards. 
+    Once both players have stuck with their hands,both sides reveal their cards.
 
     The highest total is the round winner. The first to #{ROUNDS} rounds is the GRANDWINNER.
-
     Ready? Let's get started!
     ** ENTER 'P' to play! **
-  text
-  answer = gets.chomp.downcase
-  clear if ['p','s'].include?(answer)
+  TEXT
+    answer = gets.chomp.downcase
+    clear if ['p', 's'].include?(answer)
   end
+  # rubocop:enable Metrics/MethodLength
 
   def deal_cards
     dealer.deal_initial_cards(player, deck)
@@ -303,6 +311,10 @@ class Game
 
   def display_busted(participent)
     participent.display_busted if busted?(participent)
+    clear
+    puts 'You won!' if dealer.busted?
+    puts 'Dealer won!' if player.busted?
+    sleep 2
   end
 
   def hit_or_stick_player
@@ -318,53 +330,91 @@ class Game
   end
 
   def stick?(participent)
-    participent.choice == 'stick'
+    participent.choice == 's'
   end
 
   def player_turn
     loop do
-      clear
+      display_turn(player)
       show_cards(player)
       show_total(player)
       sleep 2
+      puts ''
       hit_or_stick_player
       break if stick?(player) || busted?(player)
     end
-    display_busted(player)  
+    display_busted(player)
   end
 
   def dealer_turn
     loop do
+      display_turn(dealer)
       hit_or_stick_dealer
       break if stick?(dealer) || busted?(dealer)
     end
     display_busted(dealer)
   end
 
-  def show_result
-    show_cards(player)
-    show_total(player)
+  def display_turn(participent)
+    puts "#{participent.name}'s turn:"
     puts
-    show_cards(dealer)
-    show_total(dealer)
-    sleep 2
+  end
+
+  def show_result
+    find_winner
     clear
+    show_total(player)
+    show_total(dealer)
+    puts
     display_winner
+    sleep 4
+  end
+
+  def find_winner
+    @winner = nil
+    if player.total_hand > dealer.total_hand
+      @winner = player.name
+    elsif player.total_hand < dealer.total_hand
+      @winner = dealer.name
+    end
   end
 
   def display_winner
-    if player.total_hand > dealer.total_hand
-      puts "#{player.name} won!"
-    elsif player.total_hand < dealer.total_hand
-      puts "#{dealer.name} won!"
-    elsif player.total_hand == dealer.total_hand
+    if @winner.nil?
       puts "It's a tie!"
+    else
+      puts "#{winner} won!"
     end
     sleep 2
   end
 
+  def grand_winner?
+    scoreboard.check_for_winner
+  end
+
+  def return_grand_winner
+    @grand_winner = player.name if scoreboard.player_score == ROUNDS
+    @grand_winner = dealer.name if scoreboard.dealer_score == ROUNDS
+  end
+
+  def display_grand_winner
+    spaces = ' ' * 10
+    spaces_name = ' ' * ((32 - @grand_winner.length) / 2)
+    full_spaces = ' ' * 32
+    line = '*' * 34
+    puts <<~DISPLAY_WINNER
+    #{line}
+    *#{spaces}GRAND WINNER#{spaces}*
+    *#{spaces_name}#{(@grand_winner)}#{spaces_name}*
+    *#{full_spaces}*
+    #{line}
+    DISPLAY_WINNER
+    sleep 4
+  end
+
   def play_again?
-    puts "Would you like to play again?"
+    clear
+    puts "Would you like to play again? (y/n)"
     answer = nil
     loop do
       answer = gets.chomp.downcase
@@ -379,38 +429,86 @@ class Game
     puts 'Thank you for playing the 21 game! Goodbye!'
   end
 
+  def update_when_busted
+    if player.busted?
+      scoreboard.update(dealer)
+    elsif dealer.busted?
+      scoreboard.update(player)
+    end
+  end
+
+  def update_when_winner
+    if winner == player.name
+      scoreboard.update(player)
+    elsif winner == dealer.name
+      scoreboard.update(dealer)
+    end
+  end
+
+  def update_scoreboard
+    update_when_busted
+    update_when_winner
+  end
+
+  def display_scoreboard
+    clear
+    scoreboard.display
+    sleep 3
+  end
+
   def reset_game
     player.reset_hand
     dealer.reset_hand
     deck.reset
   end
 
-  def main_game
-    loop do 
-      loop do 
-        deal_cards
-        player_turn
-        break if busted?(player)
-        dealer_turn
-        break if busted?(dealer)
-        show_result
-        break
-      end
-    reset_game
-    break unless play_again?
+  def reset_scoreboard
+    scoreboard.reset
+  end
+
+  def turns
+    loop do
+      deal_cards
+      clear
+      player_turn
+      break if busted?(player)
+      dealer_turn
+      break if busted?(dealer)
+      show_result
+      break
     end
   end
-  
+
+  def show_grand_winner_and_reset
+    return_grand_winner
+    clear
+    display_grand_winner
+    reset_scoreboard
+  end
+
+  def main_game
+    loop do
+      loop do
+        turns
+        end_game
+        break if grand_winner?
+      end
+      show_grand_winner_and_reset
+      break unless play_again?
+    end
+  end
+
+  def end_game
+    update_scoreboard
+    display_scoreboard
+    reset_game
+  end
+
   def start
     introduction
     main_game
     goodbye_message
   end
-
 end
 
 Game.new.start
-
-
-
-# Sort out hit or stick method
