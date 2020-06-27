@@ -47,30 +47,40 @@ class Participant
     @total_hand = 0
   end
 
-  def hit(deck)
+  def clear
     system 'clear'
+  end
+
+  def hit(deck)
+    clear
     hand << deck.top_card
     puts "#{name} hits!"
     sleep 2
   end
 
   def stick
-    system 'clear'
+    clear
     puts "#{name} stuck!"
     sleep 2
   end
 
-  def display_busted
+  def display_busted    
+    clear
+    puts "#{name} busted!"    
+    sleep 2
     show_cards
     total
     sleep 2
-    system 'clear'
-    puts "#{name} busted!"
+    clear
   end
 
   def busted?
     get_total
     @total_hand > Game::WINNING_CONDITION
+  end
+
+  def show_cards
+    puts "#{name}'s cards: #{hand.join(', ')}"
   end
 
   def total
@@ -105,11 +115,10 @@ class Participant
     @total_hand = 0
   end
 
-  def show_cards
-    system 'clear'
-    puts "#{name}'s cards: #{hand.join(', ')}"
+  def reset_hand
+    @hand = []
+    @total_hand = 0
   end
-
 end
 
 class Player < Participant
@@ -170,10 +179,8 @@ class Deck
   attr_accessor :remaining_cards, :card
 
   def initialize
-    @remaining_cards = { 'Hearts': ['Ace', 2, 3, 4, 5, 6, 7, 8, 9, 'Jack', 'Queen', 'King'],
-                         'Spades': ['Ace', 2, 3, 4, 5, 6, 7, 8, 9, 'Jack', 'Queen', 'King'],
-                         'Diamonds': ['Ace', 2, 3, 4, 5, 6, 7, 8, 9, 'Jack', 'Queen', 'King'],
-                         'Clubs': ['Ace', 2, 3, 4, 5, 6, 7, 8, 9, 'Jack', 'Queen', 'King'] }
+    @remaining_cards = {}
+    reset
   end
 
   def top_card
@@ -187,6 +194,14 @@ class Deck
 
   def remove_card_from_deck(card)
     @remaining_cards.values_at(card.suit).delete(card.value)
+  end
+
+  def reset
+    @remaining_cards = { 'Hearts': ['Ace', 2, 3, 4, 5, 6, 7, 8, 9, 'Jack', 'Queen', 'King'],
+                         'Spades': ['Ace', 2, 3, 4, 5, 6, 7, 8, 9, 'Jack', 'Queen', 'King'],
+                         'Diamonds': ['Ace', 2, 3, 4, 5, 6, 7, 8, 9, 'Jack', 'Queen', 'King'],
+                         'Clubs': ['Ace', 2, 3, 4, 5, 6, 7, 8, 9, 'Jack', 'Queen', 'King'] }
+
   end
 end
 
@@ -278,12 +293,12 @@ class Game
     dealer.deal_initial_cards(player, deck)
   end
 
-  def show_cards
-    player.show_cards
+  def show_cards(participent)
+    participent.show_cards
   end
 
-  def show_total
-    player.total
+  def show_total(participent)
+    participent.total
   end
 
   def display_busted(participent)
@@ -309,8 +324,8 @@ class Game
   def player_turn
     loop do
       clear
-      show_cards
-      show_total
+      show_cards(player)
+      show_total(player)
       sleep 2
       hit_or_stick_player
       break if stick?(player) || busted?(player)
@@ -326,23 +341,70 @@ class Game
     display_busted(dealer)
   end
 
+  def show_result
+    show_cards(player)
+    show_total(player)
+    puts
+    show_cards(dealer)
+    show_total(dealer)
+    sleep 2
+    clear
+    display_winner
+  end
+
+  def display_winner
+    if player.total_hand > dealer.total_hand
+      puts "#{player.name} won!"
+    elsif player.total_hand < dealer.total_hand
+      puts "#{dealer.name} won!"
+    elsif player.total_hand == dealer.total_hand
+      puts "It's a tie!"
+    end
+    sleep 2
+  end
+
+  def play_again?
+    puts "Would you like to play again?"
+    answer = nil
+    loop do
+      answer = gets.chomp.downcase
+      break if ['y', 'n'].include?(answer)
+      puts "That's not a valid answer. Please try again."
+    end
+    answer == 'y'
+  end
+
+  def goodbye_message
+    clear
+    puts 'Thank you for playing the 21 game! Goodbye!'
+  end
+
+  def reset_game
+    player.reset_hand
+    dealer.reset_hand
+    deck.reset
+  end
+
   def main_game
     loop do 
-      deal_cards
-      player_turn
-      break if busted?(player)
-      dealer_turn
-      break if busted?(dealer)
-      break
-      #show_result
+      loop do 
+        deal_cards
+        player_turn
+        break if busted?(player)
+        dealer_turn
+        break if busted?(dealer)
+        show_result
+        break
+      end
+    reset_game
+    break unless play_again?
     end
-    play_again?
   end
   
   def start
     introduction
     main_game
-    show_result
+    goodbye_message
   end
 
 end
