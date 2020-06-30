@@ -1,31 +1,48 @@
 class CircularQueue
-  attr_accessor :queue, :oldest_position
+  attr_accessor :queue, :lowest_value
   
   def initialize(max_queue)
     @queue = {}
-    @buffer = max_queue
     1.upto(max_queue) { |num| queue[num] = nil }
   end
   
   def dequeue
-    return nil if queue.values.all?(nil)
-    oldest_position = queue.values.select {|value| value.is_a?(Integer)}.sort.shift
-    new_position = queue.key(oldest_position)
+    return nil if all_values_nil?
+    lowest_value = find_lowest_value
+    new_position = queue.key(lowest_value)
     queue[new_position] = nil
-    oldest_position
+    lowest_value
   end
     
   def enqueue(num)
-    if queue.values.count(nil).equal?(1)
+    if all_values_nil?
       new_position = queue.key(nil)
-    elsif queue.values.count(nil).equal?(0)
-      lowest_value = queue.values.select {|value| value.is_a?(Integer)}.sort.shift
+    elsif no_values_nil?
+      lowest_value = find_lowest_value
       new_position = queue.key(lowest_value)
     else
-      new_position = queue.select {|k,v| k != oldest_position && v == nil}
+      new_position = find_next_empty_nil
       new_position = new_position.keys.shift
     end
     queue[new_position] = num
+  end
+
+  private
+
+  def all_values_nil?
+    queue.values.all?(nil)
+  end
+
+  def find_lowest_value
+    queue.values.select {|value| value.is_a?(Integer)}.sort.shift
+  end
+
+  def no_values_nil?
+    queue.values.count(nil).equal?(0)
+  end
+
+  def find_next_empty_nil
+    queue.select {|k,v| k != lowest_value && v == nil}
   end
 end
 
