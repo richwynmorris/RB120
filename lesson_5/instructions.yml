@@ -1,0 +1,24 @@
+
+"** ENTER 'S' TO SKIP RULES **
+
+The Rules:
+The objective of twenty one is to get the highest collective value of
+cards without going over the number of twenty one.\n
+
+Jack, Queen and King are equal to 10 and Ace can be either 1 or 11.\n
+
+You, and the dealer, will be dealt 2 cards at the start of the round.
+You can either 'stick' with your current total or 'hit' to add another
+card.\n
+
+Once you 'stick' you cannot add another card. It's then the dealers
+turn to stick or hit.\n
+
+If your total goes over 21, you 'bust' and lose the game.\n
+
+Once both players have stuck with their hands,both sides reveal their cards.\n
+
+The highest total is the round winner. The first to 5 rounds is the GRANDWINNER.
+Ready? Let's get started!\n
+
+** ENTER 'P' to play! **"

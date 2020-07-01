@@ -1,4 +1,99 @@
+require 'yaml'
+
+module Displayable
+  TEXT = YAML.load_file('instructions.yml')
+
+  def display
+    spaces = ' ' * 11
+    puts "********************************************"
+    puts "*               SCOREBOARD                 *"
+    puts "*#{spaces}Player: #{player_score} Dealer: #{dealer_score}#{spaces} *"
+    puts "*                                          *"
+    puts "********************************************"
+  end
+
+  def display_hit
+    clear
+    puts "#{name} hits!"
+    sleep 2
+  end
+
+  def display_stick
+    clear
+    puts "#{name} stuck!"
+    sleep 2
+  end
+
+  def display_busted_player
+    clear
+    puts "#{name} busted!"
+    sleep 2
+    puts
+    show_cards
+    total
+    sleep 4
+    clear
+  end
+
+  def show_cards
+    puts "#{name}'s cards: #{hand.join(', ')}."
+  end
+
+  def display_instructions
+    puts TEXT
+    answer = gets.chomp.downcase
+    clear if ['p', 's'].include?(answer)
+  end
+
+  def display_busted(participent)
+    participent.display_busted_player if busted?(participent)
+    clear
+    puts 'You won!' if dealer.busted?
+    puts 'Dealer won!' if player.busted?
+    sleep 2
+  end
+
+  def display_twentyone
+    return unless twentyone?
+    clear
+    puts "You got 21!"
+    sleep 2
+  end
+
+  def display_turn(participent)
+    puts "#{participent.name}'s turn:"
+    puts
+    sleep 2
+  end
+
+  def display_winner
+    if @winner.nil?
+      puts "It's a tie!"
+    else
+      puts "#{winner} won!"
+    end
+    sleep 1
+  end
+
+  def display_grand_winner
+    spaces = ' ' * 10
+    spaces_name = ' ' * ((32 - @grand_winner.length) / 2)
+    full_spaces = ' ' * 32
+    line = '*' * 34
+    puts <<~DISPLAY_WINNER
+    #{line}
+    *#{spaces}GRAND WINNER#{spaces}*
+    *#{spaces_name}#{(@grand_winner)}#{spaces_name}*
+    *#{full_spaces}*
+    #{line}
+    DISPLAY_WINNER
+    sleep 4
+  end
+end
+
 class Scoreboard
+  include Displayable
+
   attr_accessor :player_score, :dealer_score
 
   def initialize
@@ -14,15 +109,6 @@ class Scoreboard
     end
   end
 
-  def display
-    spaces = ' ' * 11
-    puts "********************************************"
-    puts "*               SCOREBOARD                 *"
-    puts "*#{spaces}Player: #{player_score} Dealer: #{dealer_score}#{spaces} *"
-    puts "*                                          *"
-    puts "********************************************"
-  end
-
   def check_for_winner
     player_score == Game::ROUNDS || dealer_score == Game::ROUNDS
   end
@@ -34,6 +120,8 @@ class Scoreboard
 end
 
 class Participant
+  include Displayable
+
   attr_accessor :hand, :total_hand
 
   def initialize
@@ -49,43 +137,17 @@ class Participant
     hand << deck.top_card
   end
 
-  def display_hit
-    clear
-    puts "#{name} hits!"
-    sleep 2
-  end
-
-  def display_stick
-    clear
-    puts "#{name} stuck!"
-    sleep 2
-  end
-
-  def display_busted
-    clear
-    puts "#{name} busted!"
-    sleep 2
-    puts
-    show_cards
-    total
-    sleep 4
-    clear
-  end
-
   def busted?
     reset_total_hand
     calculate_total
     @total_hand > Game::WINNING_CONDITION
   end
 
-  def show_cards
-    puts "#{name}'s cards: #{hand.join(', ')}."
-  end
-
   def total
     reset_total_hand
     calculate_total
     puts "#{name}'s total is #{total_hand}"
+    sleep 1
   end
 
   def calculate_total
@@ -112,11 +174,13 @@ class Participant
 
   def reset_hand
     @hand = []
-    @total_hand = 0
+    reset_total_hand
   end
 end
 
 class Player < Participant
+  include Displayable
+
   attr_accessor :hand, :name, :choice
 
   def initialize
@@ -146,6 +210,8 @@ class Player < Participant
 end
 
 class Dealer < Participant
+  include Displayable
+
   attr_reader :name, :choice
 
   def initialize
@@ -167,7 +233,6 @@ class Dealer < Participant
       hit(deck)
       display_hit
       clear
-      sleep 1
     elsif total_hand >= 17 && total_hand <= Game::WINNING_CONDITION
       @choice = 's'
       display_stick
@@ -176,6 +241,8 @@ class Dealer < Participant
 end
 
 class Deck
+  include Displayable
+
   attr_accessor :remaining_cards, :card
 
   def initialize
@@ -222,6 +289,8 @@ class Card
 end
 
 class Game
+  include Displayable
+
   ROUNDS = 5
   WINNING_CONDITION = 21
 
@@ -235,6 +304,14 @@ class Game
     @grand_winner = nil
   end
 
+  def start
+    introduction
+    main_game
+    goodbye_message
+  end
+
+  private
+
   def clear
     system 'clear'
   end
@@ -243,7 +320,7 @@ class Game
     welcome
     assign_name
     greet_player
-    instructions
+    display_instructions
   end
 
   def welcome
@@ -258,8 +335,8 @@ class Game
     answer = ''
     loop do
       answer = gets.chomp
-      break unless answer.empty?
-      "Sorry, I need a valid name."
+      break if answer.chars.all? { |char| char != ' ' }
+      puts "Sorry, I need a valid name."
     end
     player.name = answer
     clear
@@ -271,37 +348,6 @@ class Game
     clear
   end
 
-  # rubocop:disable Metrics/MethodLength
-  def instructions
-    puts <<-TEXT
-    ** ENTER 'S' TO SKIP RULES **
-
-    The Rules:
-    The objective of twenty one is to get the highest collective value of
-    cards without going over the number of twenty one.
-
-    Jack, Queen and King are equal to 10 and Ace can be either 1 or 11.
-
-    You, and the dealer, will be dealt 2 cards at the start of the round.
-    You can either 'stick' with your current total or 'hit' to add another
-    card. 
-
-    Once you 'stick' you cannot add another card. It's then the dealers
-    turn to stick or hit.
-
-    If your total goes over 21, you 'bust' and lose the game.
-
-    Once both players have stuck with their hands,both sides reveal their cards.
-
-    The highest total is the round winner. The first to #{ROUNDS} rounds is the GRANDWINNER.
-    Ready? Let's get started!
-    ** ENTER 'P' to play! **
-  TEXT
-    answer = gets.chomp.downcase
-    clear if ['p', 's'].include?(answer)
-  end
-  # rubocop:enable Metrics/MethodLength
-
   def deal_cards
     dealer.deal_initial_cards(player, deck)
   end
@@ -312,14 +358,6 @@ class Game
 
   def show_total(participent)
     participent.total
-  end
-
-  def display_busted(participent)
-    participent.display_busted if busted?(participent)
-    clear
-    puts 'You won!' if dealer.busted?
-    puts 'Dealer won!' if player.busted?
-    sleep 2
   end
 
   def hit_or_stick_player
@@ -338,16 +376,20 @@ class Game
     participent.choice == 's'
   end
 
+  def twentyone?
+    player.total_hand == 21
+  end
+
   def player_turn
     loop do
       display_turn(player)
       show_cards(player)
       show_total(player)
-      sleep 2
       puts ''
       hit_or_stick_player
-      break if stick?(player) || busted?(player)
+      break if stick?(player) || busted?(player) || twentyone?
     end
+    display_twentyone
     display_busted(player)
   end
 
@@ -358,11 +400,6 @@ class Game
       break if stick?(dealer) || busted?(dealer)
     end
     display_busted(dealer)
-  end
-
-  def display_turn(participent)
-    puts "#{participent.name}'s turn:"
-    puts
   end
 
   def show_result
@@ -384,15 +421,6 @@ class Game
     end
   end
 
-  def display_winner
-    if @winner.nil?
-      puts "It's a tie!"
-    else
-      puts "#{winner} won!"
-    end
-    sleep 2
-  end
-
   def grand_winner?
     scoreboard.check_for_winner
   end
@@ -400,21 +428,6 @@ class Game
   def return_grand_winner
     @grand_winner = player.name if scoreboard.player_score == ROUNDS
     @grand_winner = dealer.name if scoreboard.dealer_score == ROUNDS
-  end
-
-  def display_grand_winner
-    spaces = ' ' * 10
-    spaces_name = ' ' * ((32 - @grand_winner.length) / 2)
-    full_spaces = ' ' * 32
-    line = '*' * 34
-    puts <<~DISPLAY_WINNER
-    #{line}
-    *#{spaces}GRAND WINNER#{spaces}*
-    *#{spaces_name}#{(@grand_winner)}#{spaces_name}*
-    *#{full_spaces}*
-    #{line}
-    DISPLAY_WINNER
-    sleep 4
   end
 
   def play_again?
@@ -451,8 +464,11 @@ class Game
   end
 
   def update_scoreboard
-    update_when_busted
-    update_when_winner
+    if player.busted? || dealer.busted?
+      update_when_busted
+    else
+      update_when_winner
+    end
   end
 
   def display_scoreboard
@@ -484,6 +500,12 @@ class Game
     end
   end
 
+  def end_game
+    update_scoreboard
+    display_scoreboard
+    reset_game
+  end
+
   def show_grand_winner_and_reset
     return_grand_winner
     clear
@@ -501,18 +523,6 @@ class Game
       show_grand_winner_and_reset
       break unless play_again?
     end
-  end
-
-  def end_game
-    update_scoreboard
-    display_scoreboard
-    reset_game
-  end
-
-  def start
-    introduction
-    main_game
-    goodbye_message
   end
 end
 
