@@ -8,10 +8,7 @@ class Move
   end
 
   def >(other_move)
-    if @beats.include?(other_move.to_s)
-      return true
-    end
-    false
+    @beats.include?(other_move.to_s)
   end
 
   def to_s
@@ -142,7 +139,7 @@ class Human < Player
       puts "Sorry, Invalid choice. Please try again."
     end
     self.move = OBJECTS[choice]
-    self.add_to_history
+    add_to_history
     system 'clear'
   end
 end
@@ -161,10 +158,10 @@ class R2D2 < Computer
 
   def choose
     self.move = OBJECTS.values.select do |object|
-      object.class != self.move.class
+      object.class != move.class
     end.sample
 
-    self.add_to_history
+    add_to_history
   end
 end
 
@@ -177,7 +174,7 @@ class OptimusPrime < Computer
 
   def choose
     self.move = [Spock.new, Lizard.new].sample
-    self.add_to_history
+    add_to_history
   end
 end
 # ------------------------------
@@ -190,7 +187,7 @@ class WallE < Computer
 
   def choose
     self.move = Rock.new
-    self.add_to_history
+    add_to_history
   end
 end
 # ------------------------------
