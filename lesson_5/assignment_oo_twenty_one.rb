@@ -103,9 +103,9 @@ class Scoreboard
 
   def update(participent)
     if participent.class == Player
-      @player_score += 1
+      self.player_score += 1
     elsif participent.class == Dealer
-      @dealer_score += 1
+      self.dealer_score += 1
     end
   end
 
@@ -114,8 +114,8 @@ class Scoreboard
   end
 
   def reset
-    @player_score = 0
-    @dealer_score = 0
+    self.player_score = 0
+    self.dealer_score = 0
   end
 end
 
