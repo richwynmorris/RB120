@@ -110,7 +110,7 @@ p my_library.how_many_books # => Expecting 1, got 0.
 Constants are scoped at the lexical level, meaning they can be accessed by both class methods and instance methods. However, they cannot be accessed between different classes. To do this, you need to call the namespace resolution operator and use this syntax:
 
 ```ruby
-Class::Constant
+class::Constant
 ```
 
 ##How do constants work in terms of inheritence? 
