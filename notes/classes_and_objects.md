@@ -1,6 +1,6 @@
 # Classes 
 
-##What are classes? 
+## What are classes? 
 Classes are the blueprints for creating objects in Ruby. Classes shape the object by defining its `behaviours` and `attributes`. When objects are created from a class we call this process `instantiation`. Classes are named using the CamelCase convention. 
 
 ```ruby
@@ -29,7 +29,7 @@ bob = Chicken.new('Bob')
 bob.squawk
 ```
 
-##What is an object?
+## What is an object?
 An object is one of the bulding blocks of object orientated programming. Objects consist of data and behaviours that are predefined
 by the class that it is instatiated from. 
 
@@ -40,19 +40,19 @@ To instantiate an object we first initialize a local variable and assign it to t
 
 Objects share behaviours but they do not share states. 
 
-##What is a constructor method?
+## What is a constructor method?
 
 A constructor method is a method that is automatically called everytime an instance of a class is instantiated. In the case of object orientated programming, a constructor method would be `#initialize`. The initialize method allows for an instance to a class to be created and but does not return anything.
 
-##What is a instance variable?
+## What is a instance variable?
 
 An instance variable is a variable that is contained within an object. Instance variables allow us to track and modify the `state` of an object. Instance variables are defined with a prepended `@` symbol. Moreover, instance variables can be 
 accessed at the scope of the object and therefore are available to instance methods that are defined within the specfic object itself. Instance variabes are not accessiable between objects and this helps achieve the concept of encapsualtion. Instance variables only exist so long as the object exists.
 
-##What does 'state' mean in the context of an object?
+## What does 'state' mean in the context of an object?
 'state' refers to the instance variables within the object and the values that they are tracking in their totality. This means an object has a particular state dependent on what its attributes are assigned to.  
 
-##What is a class variable?
+## What is a class variable?
 A class variable is a variable is scoped at the class level. A class variable is defined with `@@` and is available to both instance methods and class methods contained within the class. class variables are unique in the sense that all objects instantiated from that class share 1 copy of the class variable. This means that all objects instantiated from a class have the ability to modify the class variable. For this reason, class variables are considered to be a unpredictable method of tracking data as they go against the concept of encapsulation. Class methods can access class variables regardless of where it is initialized. 
 
 ```ruby
@@ -72,14 +72,14 @@ example = MyClass.new
 MyClass.total_times_initialized # => 1
 ```
 
-##What is a constant?
+## What is a constant?
 A constant is a variable which refences a value that should not change or be modified. A constant has a lexical scope which means it can be accessed by both the class methods and instance methods contained within the object. A constant is defined all capital letters like in the following syntax:
 
 ```ruby
 CONSTANT = ['string', 4, 3.2]
 ```
 
-##What does behaviour mean in terms of an object?
+## What does behaviour mean in terms of an object?
 A behvaiour is a operation that a object can perform. These are defined as either class methods, instance methods or methods that inherited by either a module or a superclass. 
 
 ## What does a setter method do? 
