@@ -1,5 +1,21 @@
 # Instance Variables 
 
+# What is an instance variable? 
+An instance variable is attribute within an object that allows us to track the 'state' of an object assigining, or reassigning, the instance variable with data. An instance variable is created by prepending the instance variable name with `@`. Instance variables scoped at the object level which means they be can accessed by instance methods within the object. An instance variable exits as long as the object exists. We assign an instance variable a value using the `=` operator.
+
+```ruby
+class Bird
+  attr_reader :name
+
+  def initialize
+    @name = 'Birdy'
+  end
+end
+
+bird = Bird.new
+bird.name # => Birdy
+```
+
 We know that instance variables are scoped at the object level. The question to ask is; are instance variables that are initialized in a superclass also available in a subclass. Let's look at an example to see:
 
 ```ruby

@@ -51,7 +51,24 @@ end
 
 bob = MyAccount.new
 p bob.balance # => 0
-```
 bob.balance = 100 # => NoMethodError
+```
 
+## If an attribute accessor method is defined within the object, can you intialize an instance variable outside of the object? 
+
+You can initialize an instance variable outside of the object, even if the instance variable isn't explicit within the instance of the class. 
+
+The accessor methods are build in getter and setter methods that allow us to track and modify an instance variable using the parameter of a `Symbol`. 
+
+Example:
+
+```ruby
+class Bird
+  attr_accessor :name, :age
+end
+
+birdy = Bird.new
+birdy.name, birdy.age = 'Birdy', 5 
+puts birdy.name # => Birdy
+puts birdy.age # => 5
 ```

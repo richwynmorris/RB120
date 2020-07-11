@@ -63,6 +63,22 @@ Bird.what_class_is_this
 
 The class method .new returns an object of that class which can be assigned to a local variable. This process is called instantiation. Moreover, when `.new` is called, it automatically invokes the constructor instance method '.initialize' which allows us to initialize instance variables with values and create states within the object. 
 
+## What happens if you call a class method on an instance of an object?
+If you call a class method on the instance of an object it will return a `NoMethodError` as class methods are not concerned with the instances of a class, only the class itself. This means classes do not access to objects instatiated from the class and Ruby will not be able to find the method. 
+
+Example:
+
+```ruby
+class AClass
+  def self.a_class_method
+    self
+  end
+end
+
+object = AClass.new
+object.a_class_method # => Undefined Method = NoMethodError
+``` 
+
 ## What is the difference between a class method and an instance method? 
 
 A class method can only be called on the class itself. They are scoped at the class level. A class method is prepended with the reserved word `self`. A class method cannot be invoked by an instance of the class. It is not concerned with the individual states of a given object but the class as a whole. An instance method is called by the object itself. It is scoped at the object level. Instance methods are defined in the traditional way, using the reserved words `def` and `end`. They allow the programmer to expose data and modfiy data associated with the object. 
