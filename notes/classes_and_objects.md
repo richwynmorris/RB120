@@ -129,17 +129,9 @@ end
 bob = Bird.new('Bob')
 bob.name # => 'Bob'
 ```
+## What are the two 'traits' that a class defines for an object? How do they impact the object? 
 
-
-
-
-
-
-
-
-
-
-
+The two 'traits' that a class defines for an object are its behaviours and its states. This means that every time an object is instantiated from the at class, it automatically recieves these traits. Behaviours refer to what an object can do and the operations it can perform. 'States' allow us to track the object's attributes and values.
 
 
 

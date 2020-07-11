@@ -37,6 +37,10 @@ pigeon = Bird.new('Bob', 'Pigeon')
 pigeon.change_name = 'John'
 puts pigeon.name
 ```
+
+## Why is it a good idea to call an instance method from within a class?
+It is better to contain an instance method than refer directly to the instance variable as it means we can avoid needlessly duplicating the instance variable throughout our code, achieving the DRY priniciple and extracting our logic to only one place in the program. We can also use return value of the intance method for formating our outputs..
+
 # Class Methods
 
 ## What is a class method? 
@@ -55,5 +59,10 @@ Bird.what_class_is_this
 ## What does `self` refer to in the context of a class method?
 `self` refers to the class itself in context of a class method. Once a class method is defined, `self` refers to the class itself within the method. The only place within a class where `self` does not reference the class is within an instance method. 
 
+## What happens when you call the .new method on a class? 
 
+The class method .new returns an object of that class which can be assigned to a local variable. This process is called instantiation. Moreover, when `.new` is called, it automatically invokes the constructor instance method '.initialize' which allows us to initialize instance variables with values and create states within the object. 
 
+## What is the difference between a class method and an instance method? 
+
+A class method can only be called on the class itself. They are scoped at the class level. A class method is prepended with the reserved word `self`. A class method cannot be invoked by an instance of the class. It is not concerned with the individual states of a given object but the class as a whole. An instance method is called by the object itself. It is scoped at the object level. Instance methods are defined in the traditional way, using the reserved words `def` and `end`. They allow the programmer to expose data and modfiy data associated with the object. 
