@@ -63,6 +63,9 @@ Bird.what_class_is_this
 
 The class method .new returns an object of that class which can be assigned to a local variable. This process is called instantiation. Moreover, when `.new` is called, it automatically invokes the constructor instance method '.initialize' which allows us to initialize instance variables with values and create states within the object. 
 
+## Can a class method access an instance variable? 
+No. Class methods are only interested in the class itself and not the instance variables contained within the individual instance of a class. This means class methods cannot access instance variables as they are not scoped on the same level.
+
 ## What happens if you call a class method on an instance of an object?
 If you call a class method on the instance of an object it will return a `NoMethodError` as class methods are not concerned with the instances of a class, only the class itself. This means classes do not access to objects instatiated from the class and Ruby will not be able to find the method. 
 

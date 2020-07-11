@@ -22,6 +22,67 @@ bob = Chicken.new('Bob')
 bob.talk #=> "What? You've never seen a talking Chicken before?"
 ```
 
+## What is the benefit of using inheritence?
+Inheritence allows us to order our program using a hierarchical structure and avoids duplication throughout our code. Moreover, inheritence allows us to achive the principle of polymorphism in program and we're able to build relationships between subclasses and superclasses in our program. 
+
+## What operator is used to show a subclass inheriting from a superclass?
+`<`
+
+## What is the method lookup path?
+The method lookup path is the hiearchial structure that Ruby traverses when searching for a method that has been called. It will begin by searching in the calling object and will then move up the inheritence hierarchy, searching through superclasses and modules, until either the method is found and invoked or Ruby returns a `NoMethodError`.
+
+
+## What is `super`?
+`super` is a built in Ruby method which allows you to invoke a method with the same name that `super` is defined within that is higher in the inheritence hierarchy. Ruby will search the inheritence hierachy to find the method with the same name until it is either found or it returns nil.
+
+```ruby
+class Bird
+	def initialize
+		puts "You called the initialize method in the Bird class!"
+	end
+end
+
+class Penguin < Bird
+	def initialize
+		super
+	end
+end
+
+pingu = Penguin.new # => You called the initialize method in the Bird class!
+```
+
+## Why is it important to consier the arguements you pass to super?
+When you pass an argument to super, and that argument is passed up the inheritence hierarchy, you may be inadvertandly assigning instance variables with values that are untintention. 
+
+Example
+```ruby
+class Bird
+  def initialize(name)
+    @name = name
+  end
+end
+
+class Penguin < Bird
+  def initialize(age)
+    super
+    @age = age 
+  end
+
+  def info
+    self
+  end
+end
+
+pingu = Penguin.new(4)
+p pingu.info # => #<Penguin:0x0000559c228d10a8 @name=4, @age=4>
+```
+
+
+
+
+## What is multiple inheritence?
+Multiple inhertence means a class both inherits from a superclass but also has access to the interface inheritence of a module that has been mixed into that class. 
+
 ## What is the difference between a superclass and a subclass?
 A subclass is a lower in the inheritence hierarchy and has access to any of the methods or states that exist in an superclass that it inherits from.
 
@@ -73,21 +134,39 @@ In the above example we can see that `Bird` inherits from the `Animal` class as 
 
 Moreover, we're also able to overide the `#talk` method which exists in the the `Animal` superclass but also exists in the `Bird` subclass. When a method is invoked, Ruby traverses the inheritence hierarchy, starting with the object that invoked the method. Once it finds it, it invokes it. As `#talk` was found in the calling object ('birdy'), it is executed first before Ruby continues searching the rest of the method lookup path. This means we're able to interact with objects in many different forms, using the same operator or fuction and thereby achieving the principle of polymorphism. 
 
-The other way to achieve `polymorphism` is through ducktyping. This is the process of giving an object the independence and responsibility to execute it's own behaviours, without relying on dependencies from the existing code base. Essentially, if it's a `duck` it should `quack` like a duck.  
+The other way to achieve `polymorphism` is through ducktyping. This is the process of giving an object the independence and responsibility to execute it's own behaviours, without relying on dependencies from the existing code base. You can call the same method name on a range of difference objects and object will perform the operation based on what it is. 
 
 ```ruby
-class Duck
-	def initialize(name)
-		@name = name
-	end
-
-	def quack
-		puts 'To quack or not quack? That is the question.'
-	end
+class MeetTheDucks
+  def introduce_yourselves(ducks)
+    ducks.each do |duck|
+      duck.quack
+    end
+  end
 end
 
-billiam_drakespeare = Duck.new('Billiam Drakespeare')
-billiam_drakespeare.quack
+class Billiam_Drakespeare
+  def quack
+    puts 'To quack or not quack? That is the question.'
+  end
+end
+
+class Chewquacker
+  def quack
+    puts 'qqqqquuuaaarrccchhhhwwaarr!!'
+  end
+end
+
+class James_Pond
+  def quack
+    puts "The name's quack. Quack quack."
+  end
+end
+
+ducks = [Billiam_Drakespeare.new, Chewquacker.new, James_Pond.new]
+meet_ducks = MeetTheDucks.new
+meet_ducks.introduce_yourselves(ducks)
+
 ```
 
 # Encapsulation

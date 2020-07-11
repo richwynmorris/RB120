@@ -3,7 +3,7 @@
 ## Is it a a method or is it an operator? 
 ### [], []=
 
-Method
+Methods
 
 ### **
 
@@ -11,11 +11,39 @@ Method
 
 ### !,~. +, -
 
-Method
+Methods
 
 ### *, /, %
 
-Method
+Methods
+
+### <<, >>
+
+Methods
+
+### <=, <, >, =>
+
+Methods
+
+### <=>, ==, ===, !=, =~, !~
+
+Methods
+
+## &&
+
+Operator
+
+## ||
+
+Operator
+
+## .., ...
+Operator
+
+## ? : (ternary if-then-else)
+Operator
+
+
 
 ## What does the `eql?` method check for? 
 
@@ -70,4 +98,19 @@ You would need to use the `#equal?` method to check if two objects are the same 
 str1 = 'Hello'
 str1_copy = str1
 p str1.equal?(str1_copy) # => true 
+```
+
+## What method can you use to see if two objects contain the same value? 
+You can use the `==` operator to override the `#BasicObject== method, which can then check whether to values of an object are the same. For instance the #String== method does this. 
+
+## What does the '===' method do ?
+This method will check if the right hand arguement is contained within the range of the left hand argument. This is often used with `case` statements. 
+
+```ruby
+p (0..99) === 77 #=> true
+```
+
+This can also be used to see whether an object in contained within a specific class:
+```ruby
+p String === 'Hello' # => true
 ```

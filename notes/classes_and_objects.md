@@ -40,6 +40,13 @@ To instantiate an object we first initialize a local variable and assign it to t
 
 Objects share behaviours but they do not share states. 
 
+## What is instantiation?
+Instantiation is the process of creating a new object from the a class by calling the class method `#new` and assigning the return object to a local variable. The local variable is now referencing the 'object'. The object, once instantiated, has the same behvaiours and states that are defined by class itself. However, one the object has been instantiated, it is independent from the class.
+
+```ruby
+tiger = Cat.new
+```
+
 ## What is a constructor method?
 
 A constructor method is a method that is automatically called everytime an instance of a class is instantiated. In the case of object orientated programming, a constructor method would be `#initialize`. The initialize method allows for an instance to a class to be created and but does not return anything.
@@ -132,6 +139,11 @@ bob.name # => 'Bob'
 ## What are the two 'traits' that a class defines for an object? How do they impact the object? 
 
 The two 'traits' that a class defines for an object are its behaviours and its states. This means that every time an object is instantiated from the at class, it automatically recieves these traits. Behaviours refer to what an object can do and the operations it can perform. 'States' allow us to track the object's attributes and values.
+
+## How do you return the object_id and it's data?
+You return the object id and any data associated with it by calling self within an instance method. This returns the object and it's data. 
+
+
 
 
 

@@ -190,11 +190,8 @@ sue.check_books
 Note: In the above example, the constant is modified which is not recommended. Ruby will throw a warning message if the constant is modified.
 
 
+## What does an uninitialized instance variable return? 
+An unitialized instance variable will return `nil` if it has not been yet assigned a value.
 
-
-
-
-
-
-
-
+## What is the scope of a class variable? 
+The scope of a class variable is at the class level, which means that a class variable can be accessed by both class methods and instance methods. Moreover, all instances of that class share one copy of the class variable meaning that when the class variable is modified in one object, it is modified across the entire class. Class variables are defined with '@@'.
