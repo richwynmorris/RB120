@@ -195,3 +195,8 @@ An unitialized instance variable will return `nil` if it has not been yet assign
 
 ## What is the scope of a class variable? 
 The scope of a class variable is at the class level, which means that a class variable can be accessed by both class methods and instance methods. Moreover, all instances of that class share one copy of the class variable meaning that when the class variable is modified in one object, it is modified across the entire class. Class variables are defined with '@@'.
+
+## What scope is a constant defined at? 
+A constant is defined at the lexical scope. This means it exists at the same level it is defined at. For example, within a class it would be accessible to both the class methods and instance methods that exist within that class. 
+
+

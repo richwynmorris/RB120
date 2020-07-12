@@ -29,6 +29,11 @@ bob = Chicken.new('Bob')
 bob.squawk
 ```
 
+## What are the two main behaviours of class variables? 
+All instances of a class, and the class itself, share one copy of a class variable. Therefore, anywhere where the class variable is accessable, it can be modified and changed. This will change the state of the class variable throughout the code base.
+
+Class variables have the ability to be acccessed at the class level, which means they can be accessed by both class methods and instance methods, even if it is not intiailized within them. 
+
 ## What is an object?
 An object is one of the bulding blocks of object orientated programming. Objects consist of data and behaviours that are predefined
 by the class that it is instatiated from. 
@@ -142,6 +147,50 @@ The two 'traits' that a class defines for an object are its behaviours and its s
 
 ## How do you return the object_id and it's data?
 You return the object id and any data associated with it by calling self within an instance method. This returns the object and it's data. 
+
+## What is the difference between a class method and an instance method? 
+An instance method will expose data from the object and perform operations within the scope of the object. An instance method deals directly with the object itself and has accessed to all instance variables that are initialized at the object level, even if they are not initialized within the instance method itself. However, class methods are only interested in the class itself and thus cannot be called by instances of a class, only the class itself. A class method is defined with a prepended `self.` and only has access to class variables as they are not concerned with the individual instance of a class. 
+
+## What operator should you use to make a constant defined in one object accessible to another object?
+
+You need to use the `namespace resolution operator` which will indicate to ruby what object/class/module it should search in when trying to find the constant. Constants are defined at the lexical scope, which means if it is not found at the level it was defined at, Ruby will traverse the inheritence hierarchy to find the value associated with the constant. However, by using the namespace resolution operator, we're able to indicate specifically to Ruby where we would like it to search for the constant. 
+
+Example: SCANNING INHERITENCE HIERARCHY
+```ruby
+class Vehicle
+  WHEELS = 4
+end
+
+
+class Truck < Vehicle
+  def number_of_wheels
+    puts "I have #{WHEELS} wheels on my truck"
+  end
+end
+
+ford = Truck.new
+ford.number_of_wheels # => I have 4 wheels on my truck
+```
+
+Example: REACHING INTO A DIFFERENT ClASS 
+
+```ruby
+class Vehicle
+  WHEELS = 4
+end
+
+
+class Truck
+  def number_of_wheels
+    puts "I have #{Vehicle::WHEELS} wheels on my truck"
+  end
+end
+
+ford = Truck.new
+ford.number_of_wheels # => I have 4 wheels on my truck
+```
+
+
 
 
 

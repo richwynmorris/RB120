@@ -2,7 +2,7 @@
 
 ## What are attribute accessor methods?
 
-Attribute accessor methods are build in Ruby getter and setter methods that can be defined within a class They allow us to expose and change an objects state. There are 3 different types of attribute accessor methods: attr_writer, which allows you got change the state of an object; attr_reader which allows you return the state of an object and attr_accessor which allows you to both get and set the state of an object. 
+Attribute accessor methods are build in Ruby getter and setter methods that can be defined within a class They allow us to expose and change an objects state. There are 3 different types of attribute accessor methods: `attr_writer`, which allows you got change the state of an object; `attr_reader` which allows you return the state of an object and `attr_accessor` which allows you to both get and set the state of an object. 
 
 attribute accessor methods, create an instance variable, if it has not already been explicity defined which can be made reference to using a `Symbol` object as a parameter.
 
