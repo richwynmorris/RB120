@@ -155,7 +155,8 @@ daisy.speak # => # "Daisy says moooooooooooo!"
 ## Answer:
 The reason this outputs "Daisy says moooooooooooo!" is because the `#speak` method is invoked from the `Cow` class. Speak s first called from the `Animal` superclass as it does not exist in the subclass. This calls the `#sound` method. As the original calling object was from the `Cow` class, ruby checks this first for a `#sound` method. As this exists, it is executed. Within the `sound` class, the `super` method is invoked with calls the method of the same name, which is higher in the ineritence hierarchy. This prints "Daisy says " whilst being concatanated with the `String` object `"moooooooooooo!"` from the `Cow` subclass. 
 
-
+### 8) The below code would work, but it is problematic. What is wrong with this code, and how can you fix it?
+```ruby
 class Wedding
   attr_reader :guests, :flowers, :songs
 
@@ -190,8 +191,7 @@ class Musician
     #implementation
   end
 end
-
-# 8) The above code would work, but it is problematic. What is wrong with this code, and how can you fix it?
+```
 
 The above code is problematic as we're relying on the `prepare` method to execute each of the responsibilities of each class using the dependencies within the method, rather than allowing the execution of the behaviours to take place within the object. This means if the we want to add another class to the `preparers` we would need to go in an alter the `prepare` method again. We can solve this problem through ducktyping. 
 
