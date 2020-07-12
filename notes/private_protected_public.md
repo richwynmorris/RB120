@@ -92,7 +92,7 @@ class Person
     puts "#{name}'s account number is XXXX-XXX-" + last_three_digits
   end
 
-  def >(other)
+  def compare_balance(other)
   	balance > other.balance
   end 
 
@@ -108,7 +108,7 @@ end
 
 john = Person.new('John', 34, 80)
 tom = Person.new('Tom', 44, 100)
-p tom > john # => true
+p tom.compare_balance(john) # => true
 ```
 
 
