@@ -637,11 +637,26 @@ bob.last_name = 'Smith'
 p bob.name                  # => 'Robert Smith'
 ```
 
+### 26) Now create a smart name= method that can take just a first name or a full name, and knows how to set the first_name and last_name appropriately.
 
+```ruby
+class Person
+  attr_accessor :first_name, :last_name
+  
+  def initialize(name)
+    @first_name = name.split.first
+    @last_name = name.split.length.eql?(1) ? '' : name.split.first
+  end
+  
+  def name
+    "#{first_name} #{last_name}"
+  end
 
-## To Finish!
-------------
-Now create a smart name= method that can take just a first name or a full name, and knows how to set the first_name and last_name appropriately.
+  def name=(name)
+    self.first_name = name.split.first
+    self.last_name = name.split.last
+  end
+end
 
 bob = Person.new('Robert')
 bob.name                  # => 'Robert'
@@ -653,7 +668,11 @@ bob.name                  # => 'Robert Smith'
 bob.name = "John Adams"
 bob.first_name            # => 'John'
 bob.last_name             # => 'Adams'
-Link #3
+```
+
+### 27) # What will this return, and why?
+
+```ruby
 class Animal
   def initialize(name)
     @name = name
@@ -670,8 +689,12 @@ end
 
 teddy = Dog.new("Teddy")
 puts teddy.dog_name                       # => ??
-# What will this return, and why?
-Link
+```
+#Answer:
+This will retrurn "bark! bark!   bark! bark!" as the `initialize` in the `Dog` class overides the `initialize` method in the `Animal` class. As a result, The `@name` instance variable is never initialized with a value and therefore returns `nil`. When `nil` is interpolated within a string, it appears as an empty space.  
+
+### 28) What is wrong with the code below? Why? What principle about getter/setter methods does this demonstrate?
+```ruby
 class Cat
   attr_accessor :name
 
@@ -687,9 +710,14 @@ end
 kitty = Cat.new('Sophie')
 p kitty.name # "Sophie"
 kitty.rename('Chloe')
-p kitty.name # "Chloe"
-# What is wrong with the code above? Why? What principle about getter/setter methods does this demonstrate?
-Link
+p kitty.name # "Sophie"
+```
+### Answer:
+The reason that the `rename` method does perform how we expect it to is a result of the accessor `name` not being reassigned in the instance method definition. When you call an accessor method, from within the object, and you wish to reassign it with a new value, you must prepend the accessor method name with `self.` to indicate to ruby that the you are calling the accessor method on the object itself, rather than initializing a new local variable and assigning it a value within the scope of the method. 
+
+### 29) You can see in the `make_one_year_older method` we have used self. What does self refer to here?
+
+```ruby
 class Cat
   attr_accessor :type, :age
 
@@ -702,18 +730,16 @@ class Cat
     self.age += 1
   end
 end
-You can see in the make_one_year_older method we have used self. What does self refer to here?
+```
+### Answer:
+`self` within the instance method here refers to the objects itself. We need to prepend any instance method with `self` to indicate to Ruby that we're not initializing a new local variable and assigning it a new value but instead calling the method from within the object either to return a value or reassign an instance variable with a new value.
 
 
-Link #8
+### Instance methods vs. class methods, self, Calling methods with self, More about self, to_s, overriding to_s
 
+### 30) On which lines in the following code does self refer to the instance of the MeMyselfAndI class referenced by i rather than the class itself? Select all that apply.
 
-
-Instance methods vs. class methods, self, Calling methods with self, More about self, to_s, overriding to_s
-
-On which lines in the following code does self refer to the instance of the MeMyselfAndI class referenced by i rather than the class itself? Select all that apply.
-
-
+```ruby
 class MeMyselfAndI
   self
 
@@ -727,14 +753,23 @@ class MeMyselfAndI
 end
 
 i = MeMyselfAndI.new
-Link #19
-Continuing with our Person class definition, what does the below print out?
+```
+### Answer:
+Line 751
 
+
+### 31) Continuing with our Person class definition, what does the below print out?
+
+```ruby
 bob = Person.new("Robert Smith")
 puts "The person's name is: #{bob}"
-Link #5a
-Let's add a to_s method to the class:
+```
+`bob`, when interpolated within the string, is referencing the object itself. Therefore the object classification and data will be interpolated within the string.
 
+
+### 31) Let's add a to_s method to the class:
+
+```ruby
 class Person
   # ... rest of class omitted for brevity
 
@@ -742,11 +777,15 @@ class Person
     name
   end
 end
-Now, what does the below output?
+# Now, what does the below output?
 
 bob = Person.new("Robert Smith")
 puts "The person's name is: #{bob}"
-Link #5b
+```
+The code will now output "The person's name is: Robert Smith" as the built in ruby method `to_s` has been overidden within the class to instead return the instance variable `@name`'s value, which is `Robert Smith`. This is interpolated within the string.
+
+### 32) Why does this code not have the expected return value?
+```ruby
 class Student
   attr_accessor :grade
 
@@ -757,46 +796,59 @@ end
 
 ade = Student.new('Adewale')
 ade # => #<Student:0x00000002a88ef8 @grade=nil, @name="Adewale">
-# Why does this code not have the expected return value?
-Link #2, D
+```
+This is because the built in Ruby method `to_s` has not been overridden within the class and, as a result, will not format the expected output. Instead it will return the object classifcation and data associated with the object.
 
+## Fake operators and equality
 
+### 33) # What will the code above return and why?
 
-
-
-Fake operators and equality
-
+```ruby
 arr1 = [1, 2, 3]
 arr2 = [1, 2, 3]
-arr1.object_id == arr2.object_id      # => ??
+arr1.object_id == arr2.object_id      # => false
 
 sym1 = :something
 sym2 = :something
-sym1.object_id == sym2.object_id      # => ??
+sym1.object_id == sym2.object_id      # => true
 
 int1 = 5
 int2 = 5
-int1.object_id == int2.object_id      # => ??
-# What will the code above return and why?
-Link
+int1.object_id == int2.object_id      # => true
+```
+The reason that the first comparison of array objects returns false, is a result of the array objects, whilst both containing the same values, not being the same array object. However, the second and third examples, `Integers` and `Symbols` are immutable objects and thus point to the same place in the memory and can be considered the same object.
+
+### 34) How can you make this code function? How is this possible?
+
+```ruby
 class Person
+  include Comparable
   attr_accessor :name, :age
 
   def initialize(name, age)
     @name = name
     @age = age
   end
-End
+  
+  def >(other)
+    self.age > other.age
+  end
+end
 
 bob = Person.new("Bob", 49)
 kim = Person.new("Kim", 33)
 puts "bob is older than kim" if bob > kim
-# How can you make this code function? How is this possible?
-Link
+```
+
+### 35) What happens here, and why?
+```ruby
 my_hash = {a: 1, b: 2, c: 3}
 my_hash << {d: 4}  
-# What happens here, and why?
-Link
+```
+This will return an undefined error as the `<<` method as not been defined as a custom method within the class/object. As a result, ruby will not be able to interpret the method. 
+
+### 36) What does the Team#+ method currently return? What is the problem with this? How could you fix this problem?
+```ruby
 class Team
   attr_accessor :name, :members
 
@@ -810,7 +862,9 @@ class Team
   end
 
   def +(other_team)
-    members + other_team.members
+    temporary_team = Team.new('Dream Team')
+    temporary_team.members = members + other_team.members
+    temporary_team
   end
 end
 
@@ -822,5 +876,6 @@ cowboys << Person.new("Troy Aikman", 48)
 niners = Team.new("San Francisco 49ers")
 niners << Person.new("Joe Montana", 59)
 dream_team = cowboys + niners               # what is dream_team?
-# What does the Team#+ method currently return? What is the problem with this? How could you fix this problem?
-Link
+```
+The Team method currenntly returns an array object instead of a `Team` object. Our objects should always be representative of what they are. To fix this, you would need to create a new `Team` object and assign the `members` instance value with the `People` classes. 
+
