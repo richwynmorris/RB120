@@ -151,7 +151,7 @@ MyClass.class_method
 test.display_class_variable
 ```
 
-## Practical Case Use for Class Variables
+### Practical Case Use for Class Variables
 
 ```ruby
 class VauxhallCarManufactorer
@@ -213,7 +213,7 @@ p Car.wheels
 
 Instance variables and instance methods cannot be called from within a class method as a class method is not defined at the same scope.
 
-## Example: Instance method not accessible within class method: 
+### Example: Instance method not accessible within class method: 
 
 ```ruby
 class Car
@@ -229,7 +229,7 @@ end
 p Car.display_name # => NameError
 ```
 
-## Example: Inst variable not available within the scope of the class method:
+### Example: Inst variable not available within the scope of the class method:
 
 ```ruby
 class Car
@@ -250,7 +250,7 @@ The class method returns `nil` as the instance variable, within the scope if the
 
 However, if you initialize the instance variable with a value, within the scope of the class method, it will return the value assigned to the instance variable. 
 
-## Example: Inst variable available within the scope of the class method:
+### Example: Inst variable available within the scope of the class method:
 
 ```ruby
 class Car  
@@ -263,7 +263,7 @@ end
 Car.wheels # => 4
 ```
 
-## What level are instance variables scoped at?
+### What level are instance variables scoped at?
 Instance variables are scoped at the object level which means that they are avaialable to all instance methods at the scope of the object. Instance variables are not share between objects. This one of the ways that Ruby is able to achieve the encapsualtion priniciple. Instance variables allow us to track the state of an object. 
 
 
