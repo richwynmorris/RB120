@@ -124,7 +124,7 @@ SuperClass.class_method
 test.display_class_variable
 ```
 
-### Example 2:
+### Example 2:
 
 In the example below, the class variable `@@class_variable` is scoped at the `SuperClass` level, this means it is accessible to the subclasses that inherit from `SuperClass`. The class `MyClass` can access the class variable defined in the superclass and alter it's value from within the subclass. This also alters `class_variables`'s value in objects that are instantiated from the class. For example, `test`.  
 
