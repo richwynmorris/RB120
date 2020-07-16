@@ -19,7 +19,7 @@ corsa.wheels # => 4
 ```
 
 ## What is a class and can you give an example?
-A class is the blueprint for objects which are instantiated from it. It defines the behaviours and attributes within an object.
+A class is the blueprint for objects which are instantiated from it. It defines the behaviours and attributes within an object. Classes can inherit from one another and can be ordered in a single inheritence sequence. The parent is called the `superclass` and the child is called the `subclass`.
 
 ```ruby
 class Car
@@ -76,6 +76,24 @@ fido = Pets::Dog.new
 p fido.class # => Pets::Dog
 ```
 
+### Example of working around class collision:
+
+```ruby
+module Town
+  class Animal ; end
+end
+
+module Forest
+  class Animal ; end
+end
+
+town_fox = Town::Animal.new
+forest_fox = Forest::Animal.new
+
+p town_fox.class # => Town::Animal
+p forest_fox.class # => Forest::Animal
+```
+
 * Finally, modules have the ability to act as containers for behaviours and methods. we're able to call a method directly from the module. It is important to remember that you need to call `self` on a module method to indicate to ruby that this is a `module method` being called on the module itself.
 
 ```ruby
@@ -89,7 +107,48 @@ result = Multiplyable::by_2(4)
 p result
 ```
 
-## Polymorphism, Inheritence and Encapsulaiton
+## What is the inheritence model that modules use? 
+
+Modules use **Interface Inheritence** which is the ability to inherit the interface of the module and use it's defined behaviours as opposed to inheriting directly from a single superclass. A class can mixin as many modules as it wants.
+
+
+## What are the 3 defining factors to think of when deciding whether to use an interface inheritence of class inheritence?
+
+- Modules cannot be instantiated, so if you would like to instantiate an object with predefiend attrubute and behaviours, you will need to use class inheritence.
+
+- Classes can only inherit from one superclass. However, you can min in as many modules as you would like.
+
+- Modules are used for a 'has-a' relationship, whereas if the relationship is a 'is-a' relationship, it would be more appropriate to use a class.
+
+## Can modules subclass? 
+
+No. Modules, unlike classes, cannot subclass from one another.
+
+```ruby
+module Multiplyable
+  def self.by_2(value)
+    value * 2
+  end
+end
+
+module Timestwoable < Multiplyable
+end
+
+result = Timestwoable::by_2(4) # => syntax error, unexpected '<' module Timestwoable < Multiplyable
+```
+
+### What actually is a mixin?
+
+A mixin in a ruby facility to create multiple inheritence.
+
+### How can we find out what sequence the method lookup path takes when searching through modules.
+
+## Polymorphism, Inheritence and Encapsulation
+
+## What is polymorphism?
+
+Polymorphism is the process of using a method of function in different ways with different data input. Technically, it is our ability to redefine methods for derived classes.
+
 
 
 ## Class Variables
@@ -229,7 +288,7 @@ end
 p Car.display_name # => NameError
 ```
 
-### Example: Inst variable not available within the scope of the class method:
+### Example: Instance variable not available within the scope of the class method:
 
 ```ruby
 class Car
@@ -250,7 +309,7 @@ The class method returns `nil` as the instance variable, within the scope if the
 
 However, if you initialize the instance variable with a value, within the scope of the class method, it will return the value assigned to the instance variable. 
 
-### Example: Inst variable available within the scope of the class method:
+### Example: Instance variable available within the scope of the class method:
 
 ```ruby
 class Car  
