@@ -111,6 +111,28 @@ p result
 
 Modules use **Interface Inheritence** which is the ability to inherit the interface of the module and use it's defined behaviours as opposed to inheriting directly from a single superclass. A class can mixin as many modules as it wants.
 
+Modules work on horizontal interface inheritence basis and as such modules can be included within one another using the `include` method. 
+
+```ruby
+module Speakable
+  def speak
+    "Look I'm speaking!"
+  end
+end
+
+module Swimmable
+  include Speakable
+
+  def swim
+    "Look I'm swimming!"
+  end
+end
+
+class Person
+  include Swimmable
+end
+
+adam = Person.new.speak # => "Look I'm speaking!"
 
 ## What are the 3 defining factors to think of when deciding whether to use an interface inheritence of class inheritence?
 
@@ -273,7 +295,65 @@ fiat.name
 In the above, `super` is invoked, when the constructor method `#initialize` is invoked on line 262. As a result, ruby traverses the method lookup path searching for the another method with the same name, `#initialize`,to invoke it. In this case, Ruby finds the method `#initialize` in the superclass `Vehicle` and passes in the sting argument to the method. The parameter `name` now points to the string object within `Vehicle#initialize` and is assigned to the `@name` instance variable. As `Vehicle` has access to the accessor method `attr_reader`, the object that fiat is referencing, is able to call this method and return the value associated with the instance variable as it inherits from the `Vehicle` class. 
 
 
+### What is encapsulation and can you provide an example of it in use? 
 
+Encapsulation is at its essence data protection. It is the ability to create clearly defined boundaries between objects which only interact through their public interfaces. Encapsulation is a key OOP design princicple and can be achieved through instantiation, the public, private and protected methods and accessor methods. 
+
+## How can you achieve encapsulation through instantiation? 
+
+Instantiation is the process of creating an object from a class. This object is an instance of a class. When an object is instantitated, it is defined with the behaviours and attributes that are contained within the class. As a result, no two objects share data between one another. 
+
+```ruby
+class Dog
+  attr_accessor :name
+
+  def initialize(name)
+    @name = name
+  end
+end
+
+fido = Dog.new('Fido')
+hudson = Dog.new('Hudson')
+
+p fido.name #=> 'Fido'
+p hudson.name # => 'Hudson'
+
+
+fido.name = 'Lassey'
+p fido.name # => 'Lassey'
+p hudson.name # => 'Hudson'
+```
+
+Although both objects are instantiated from the same class, once they have been instantiated, they are independent of one another and do not share states. They are independent in terms of their data. 
+
+## How can we achieve encapsulation through accessor methods?
+
+Accessor methods are our ability to both get and set data within an object. This means we're able to expose data from an object and reassign it with new data through the public interface of the object. The types of accessor methods that we decide to include within our class blueprint, and that which objects instatiated from it will have access to, will decide to what extent we can interact with the object.
+
+
+### Custom getter and setter example: 
+
+```ruby
+class Person
+  def initialize(name)
+    @name = name
+  end
+
+  def name
+    @name # => custom getter method
+  end
+
+  def name=(name) # => custom setter method
+    @name = name
+  end
+end
+
+
+richard = Person.new('Richard')
+p richard.name # => 'Richard'
+richard.name = 'Josh'
+p richard.name # => 'Josh'
+```
 
 ## Class Variables
 
