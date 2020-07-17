@@ -145,9 +145,133 @@ A mixin in a ruby facility to create multiple inheritence.
 
 ## Polymorphism, Inheritence and Encapsulation
 
-## What is polymorphism?
+### What is polymorphism?
 
-Polymorphism is the process of using a method of function in different ways with different data input. Technically, it is our ability to redefine methods for derived classes.
+Polymorphism is ability for different data to respond to a same common interface. Technically, it is our ability to redefine methods for derived classes. Polymorphism can be achieved in three ways through inheritence, method overiding and ducktyping.
+
+
+### What is ducktyping and can you demonstrate an example of ducktyping?
+Ducktyping is the process of calling the same method on a number of objects and giving the object the ability to perform the behaviour, independent of the existing code base and any dependencies. Ruby does not care what the class is only that the method is available to be called from the object.
+
+```ruby
+class Introduction
+  def self.introduce_the_ducks(ducks)
+    ducks.each do |duck|
+      duck.quack
+    end
+  end
+end
+
+class BilliamDrakespeare
+  def quack
+    puts "To Quack of not to Quack? That is the question."
+  end
+end
+
+class JamesPond
+  def quack
+    puts "The name is Quack. Quack Quack."
+  end
+end
+
+Introduction.introduce_the_ducks([BilliamDrakespeare.new, JamesPond.new])
+```
+
+### How does class inheritence achieve polymorphism? Can you provide an example? 
+
+Class inheritence allows us to achieve polymorphism by giving us the ability inherit methods from an existing superclass yet use data that is conatined within the object itself.
+
+```ruby
+class Car
+  attr_reader :number_of_doors
+  def initialize(model)
+    @model = model
+    @number_of_doors = 5
+  end
+
+  def door_info
+    puts "This car comes with #{number_of_doors} doors"
+  end
+end
+
+class Astra < Car
+  def initialize
+    super('Vauxhall Astra')
+    @number_of_doors = 3
+  end
+end
+
+my_car = Astra.new
+my_car.door_info
+```
+
+In the example above, the `Astra` class is able to inherit the `#door_info` method from it's super class, `Car`, yet is able to use this method in conjuction with it's own data. `@number_of_doors` is assigned the value of 3 and this is the data that is made reference to within the string inerpolation of`#door_info`.  My_car is referencing a `Vauxhall` object which is calling object and where Ruby looks first to find's the data it needs to complete the string interpolation.
+
+### How does method overiding achieve polymorphism? 
+
+Method overiding allows us to achieve polymorphism by having objects overide their built in methods, meaning they are able to respond using their own data to a common interface or method call. 
+
+```ruby
+class Car
+  def initialize(model, year)
+    @model = model
+    @year = year
+  end
+end
+
+
+astra = Car.new('Astra', 2013)
+astra.to_s # => #<Car:0x0000559013e56958>
+```
+In the example above, calling the `#to_s` method on the object returns the object class and object id within a string object. This is because Ruby is using the `Object#to_s` method that is built in to all objects. In order to make this method more useful, and more user friendly, we can create our own custom `#to_s` method to overide the prexisting method built into the class. For example, we could format the return value to print what the user might expect:
+
+```ruby
+class Car
+  attr_reader :model, :year
+  def initialize(model, year)
+    @model = model
+    @year = year
+  end
+
+  def to_s
+    puts <<~HEREDOC
+      Model: #{model}
+      Year: #{year}
+    HEREDOC
+  end
+end
+
+astra = Car.new('Astra', 2013)
+astra.to_s 
+# => Model: Astra
+#    Year: 2013
+```
+
+### Using Super
+We can also extend a methods functionality by using the `super` method. When `super` is invoked within a method, ruby traverses the method lookup path to find a method with the same name as the one that `super` has been included with. Once it finds this method, Ruby will invoke it. This allows us to achieve polymorphism as the object is able to interact with a common interface yet use its own data and functionality from within the object.
+
+```ruby
+class Vehicle
+  attr_reader :name
+  def initialize(name)
+    @name = name
+  end
+end
+
+class Car < Vehicle
+  def initialize(name)
+    super(name)
+    @wheels = 4
+  end
+end
+
+fiat = Car.new('Punto')
+fiat.name
+
+```
+
+In the above, `super` is invoked, when the constructor method `#initialize` is invoked on line 262. As a result, ruby traverses the method lookup path searching for the another method with the same name, `#initialize`,to invoke it. In this case, Ruby finds the method `#initialize` in the superclass `Vehicle` and passes in the sting argument to the method. The parameter `name` now points to the string object within `Vehicle#initialize` and is assigned to the `@name` instance variable. As `Vehicle` has access to the accessor method `attr_reader`, the object that fiat is referencing, is able to call this method and return the value associated with the instance variable as it inherits from the `Vehicle` class. 
+
 
 
 
