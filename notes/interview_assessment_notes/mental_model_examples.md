@@ -299,7 +299,7 @@ In the above, `super` is invoked, when the constructor method `#initialize` is i
 
 Encapsulation is at its essence data protection. It is the ability to create clearly defined boundaries between objects which only interact through their public interfaces. Encapsulation is a key OOP design princicple and can be achieved through instantiation, the public, private and protected methods and accessor methods. 
 
-## How can you achieve encapsulation through instantiation? 
+### How can you achieve encapsulation through instantiation? 
 
 Instantiation is the process of creating an object from a class. This object is an instance of a class. When an object is instantitated, it is defined with the behaviours and attributes that are contained within the class. As a result, no two objects share data between one another. 
 
@@ -326,7 +326,7 @@ p hudson.name # => 'Hudson'
 
 Although both objects are instantiated from the same class, once they have been instantiated, they are independent of one another and do not share states. They are independent in terms of their data. 
 
-## How can we achieve encapsulation through accessor methods?
+### How can we achieve encapsulation through accessor methods?
 
 Accessor methods are our ability to both get and set data within an object. This means we're able to expose data from an object and reassign it with new data through the public interface of the object. The types of accessor methods that we decide to include within our class blueprint, and that which objects instatiated from it will have access to, will decide to what extent we can interact with the object.
 
