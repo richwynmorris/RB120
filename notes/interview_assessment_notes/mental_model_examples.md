@@ -297,7 +297,7 @@ In the above, `super` is invoked, when the constructor method `#initialize` is i
 
 ### What is encapsulation and can you provide an example of it in use? 
 
-Encapsulation is at its essence data protection. It is the ability to create clearly defined boundaries between objects which only interact through their public interfaces. Encapsulation is a key OOP design princicple and can be achieved through instantiation, the public, private and protected methods and accessor methods. 
+Encaosulation hides the implementation details of a class from other objects within the program. Encapsulation is at its essence data protection. It is the ability to create clearly defined boundaries between objects which only interact through their public interfaces. Encapsulation is a key OOP design princicple and can be achieved through instantiation, access modifiers (public, private and protected methods) and accessor methods. 
 
 ### How can you achieve encapsulation through instantiation? 
 
@@ -353,6 +353,39 @@ richard = Person.new('Richard')
 p richard.name # => 'Richard'
 richard.name = 'Josh'
 p richard.name # => 'Josh'
+```
+
+### How can you achieve encapsulation through the use of access modifiers (public, protect, private)? 
+
+Access modifiers set the visibility of an object's methods and data in relation to other objectss. Ruby has 3 access modifiers: public, private and protected. Ruby methods are public unless we say otherwise. 
+
+Public methods can be called from outside of the class, through the public interface, and within the class using the reserved word `self`. 
+
+Private methods can be called within the class but cannot be called from outside the class. Private methods are only able to perform operations within the context of the class. 
+
+Protected methods act like private methods when interacting with objects outside of the class but act like public methods within the context of the class.
+
+Protected methods can be called within the literal `self` whereas, prior to Ruby 2.7, `private` methods were unable be called with the literal `self`. 
+
+Protected methods are primarily used when calling a shared method interface between two objects. 
+
+
+### Example: Public method
+
+```ruby
+class Box
+  def open
+    puts "The box is now open."
+  end
+
+  def close
+    puts "The box is now closed."
+  end
+end
+
+box = Box.new
+box.open # => public method
+box.close # => public method
 ```
 
 ## Class Variables
