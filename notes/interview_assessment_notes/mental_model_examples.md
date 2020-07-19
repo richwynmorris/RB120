@@ -361,7 +361,72 @@ Access modifiers set the visibility of an object's methods and data in relation 
 
 Public methods can be called from outside of the class, through the public interface, and within the class using the reserved word `self`. 
 
+
+### Example: Public method
+
+```ruby
+class Student
+  attr_reader :name, :age
+
+  def initialize(name, age, subject, score)
+    @name = name
+    @age = age
+    @subject = subject
+    @score = score
+  end
+
+  def student_info # <= Public Method
+    puts <<~HEREDOC
+    Name: #{name}
+    Age: #{age}
+    HEREDOC
+  end
+end
+
+harry = Student.new('Harry Potter', 20, 'Magic', 70)
+harry.student_info
+```
+
 Private methods can be called within the class but cannot be called from outside the class. Private methods are only able to perform operations within the context of the class. 
+
+### Example: Private Method
+
+```ruby
+class Student
+  attr_reader :name, :age
+
+  def initialize(name, age, subject, score)
+    @name = name
+    @age = age
+    @subject = subject
+    @score = score
+  end
+
+  def student_info # <= Public Method
+    puts <<~HEREDOC
+    Name: #{name}
+    Age: #{age}
+    HEREDOC
+  end
+
+  def display_passed_status
+    if score > 80
+      puts "#{@name} passed the test"
+    else
+      puts "#{@name} didn't pass the test"
+    end
+  end
+
+  private
+
+  attr_reader :score # <= private accessor method
+end
+
+harry = Student.new('Harry Potter', 20, 'Magic', 70)
+
+harry.student_info
+harry.display_passed_status
+```
 
 Protected methods act like private methods when interacting with objects outside of the class but act like public methods within the context of the class.
 
@@ -369,23 +434,57 @@ Protected methods can be called within the literal `self` whereas, prior to Ruby
 
 Protected methods are primarily used when calling a shared method interface between two objects. 
 
-
-### Example: Public method
+### Example :Protected Method
 
 ```ruby
-class Box
-  def open
-    puts "The box is now open."
+class Student
+  attr_reader :name, :age
+
+  def initialize(name, age, subject, score)
+    @name = name
+    @age = age
+    @subject = subject
+    @score = score
   end
 
-  def close
-    puts "The box is now closed."
+  def student_info # <= Public Method
+    puts <<~HEREDOC
+    Name: #{name}
+    Age: #{age}
+    HEREDOC
   end
+
+  def display_passed_status
+    if score > 80
+      puts "#{@name} passed the test"
+    else
+      puts "#{@name} didn't pass the test"
+    end
+  end
+
+  def enrolled_on_same_course_as(other_student)
+    if subject == other_student.subject
+      puts "Both students are on the same course."
+    else
+      puts 'Both students are on different courses.'
+    end
+  end
+
+  protected
+
+  attr_reader :subject # <= protected accessor method
+
+  private
+
+  attr_reader :score # <= private accessor method
 end
 
-box = Box.new
-box.open # => public method
-box.close # => public method
+alex = Student.new('Alex Ryder', 20, 'English', 86)
+harry = Student.new('Harry Potter', 20, 'Magic', 70)
+
+harry.student_info
+harry.display_passed_status
+harry.enrolled_on_same_course_as(alex)
 ```
 
 ## Class Variables
