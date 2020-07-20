@@ -169,7 +169,7 @@ A mixin in a ruby facility to create multiple inheritence.
 
 ### What is polymorphism?
 
-Polymorphism is ability for different data to respond to a same common interface. Technically, it is our ability to redefine methods for derived classes. Polymorphism can be achieved in three ways through inheritence, method overiding and ducktyping.
+Polymorphism is ability for different data to respond to a same common interface. Technically, it is our ability to redefine methods for derived classes. Polymorphism can be achieved in three ways through inheritence(interface and hierarchial), method overiding and ducktyping.
 
 
 ### What is ducktyping and can you demonstrate an example of ducktyping?
@@ -355,9 +355,26 @@ richard.name = 'Josh'
 p richard.name # => 'Josh'
 ```
 
+### Accessor methods example:
+
+```ruby
+class Person
+  attr_accessor :name
+
+  def initialize(name)
+    @name = name
+  end
+end
+
+richard = Person.new('Richard')
+p richard.name # => 'Richard'
+richard.name = 'Josh'
+p richard.name # => 'Josh'
+```
+
 ### How can you achieve encapsulation through the use of access modifiers (public, protect, private)? 
 
-Access modifiers set the visibility of an object's methods and data in relation to other objectss. Ruby has 3 access modifiers: public, private and protected. Ruby methods are public unless we say otherwise. 
+Access modifiers set the visibility of an object's methods and data in relation to other objects. Ruby has 3 access modifiers: public, private and protected. Ruby methods are public unless we say otherwise. 
 
 Public methods can be called from outside of the class, through the public interface, and within the class using the reserved word `self`. 
 
@@ -486,6 +503,208 @@ harry.student_info
 harry.display_passed_status
 harry.enrolled_on_same_course_as(alex)
 ```
+
+### What is class inheritence and can you provide an example?
+
+Class inheritence is the ability for predefined classes to inherit both behaviours and states from one another. This achieves the design principle of polymorphism within the object orientated paradigm and also allos us to avoid duplication in our code. The 'parent' class is detemined as the `superclass`. A superclass is more general and larger in purpose. The child class is what we would call a `subclass`. This inherits both the behaviours and states from the larger, superclass. A subclass is more highly grained and specific compared to the `superclass`. Ruby supports only single inheritence when it comes to class inheritence. 
+
+### Example: 
+```ruby
+class Animal
+  attr_reader :name
+
+  def initialize(name)
+    @name = name
+  end
+end
+
+
+class Dog < Animal
+  def bark
+    puts "woof!"
+  end
+end
+
+fido = Dog.new('Fido The Dog')
+p fido.name # => Fido The Dog
+```
+
+In the example above, the superclass `Animal` contains the data and behaviours related to an animal's name. As all animals have names, it seems logical and appropriate to store this data in a more general superclass. The `Dog` class inherits from the `Animal` class, however, it has its own behaviour which is relevant to its class only. For example, the `#bark` method.
+
+When we instantiate a new `Dog` object, Ruby traverses the method lookup path to invoke the `#intitialize` method. As this does not exist in the `Dog` class, moves up the inheritence hierarchy and finds the method within the `Animal` class. Ruby then invokes the method and initializes the instance variable `@name` with the string data that is passed to the method as an argument. As the accessor method attr_reader is available in the `Animal` superclass, we can invoke the getter method `#name` from our `Dog` object and return the data assigned to the instance variable `@name` without needing to duplicate the method in the `Dog` class.
+
+### How can we find out what path Ruby takes to find a method to invoke? 
+
+We can check the method lookup path by invoking the ancestors any class. This will display the search order than Ruby will take when trying to find a method that had been invoked. 
+
+```ruby
+module Runnable
+  def run
+    puts "I'm running!"
+  end
+end
+
+class Animal
+  def initialize(name)
+    @name = name
+  end
+end
+
+class Cat < Animal
+  include Runnable
+
+  def speak
+    puts 'Meow!'
+  end
+end
+
+class Dog < Animal
+  include Runnable
+
+  def speak
+    puts 'woof!'
+  end
+end
+
+hudson = Dog.new('Hudson')
+hudson.speak
+hudson.run
+Dog.ancestors # => [Dog, Runnable, Animal, Object, Kernel, BasicObject]
+```
+
+## What are the two forms inheritence?
+
+The two forms of inheritence are class inheritence and interface inheritence.
+
+Class inheritence works in a verticle fashion, in the sense that a subclass can only inherit from one superclass. We allow classes to inherit from one another when they have a `is a` relationship. The other form of inheritence is interface inheritence and this is achieved by including a module within a class. This means the class has access to the predefined behvaiours that exist within the module. We can think of this as horizontal inheritence. A class can 'mixin' from as many modules as it wants. Modules can use interface inheritence, with one another but cannot use the inheritence operator. 
+
+```ruby
+module Speakable
+  def speak
+    puts "I'm speaking!"
+  end
+end
+
+module Swimmable
+  include Speakable
+  
+  def swim
+    puts "I'm swimming!"
+  end
+end
+
+class Animal
+  include Swimmable
+
+  def initialize(name)
+    @name = name
+  end
+end
+
+dog = Animal.new('Hudson')
+dog.speak # => "I'm speaking!"
+
+----------------------------
+
+module Speakable
+  def speak
+    puts "I'm speaking!"
+  end
+end
+
+module Swimmable < Speakable
+  def swim
+    puts "I'm swimming!"
+  end
+end
+
+class Animal
+  include Swimmable
+
+  def initialize(name)
+    @name = name
+  end
+end
+
+dog = Animal.new('Hudson')
+dog.speak # => "Syntax Error module Swimmable < Speakable"
+```
+
+### What are the important aspects to understand regarding `super`'s functionality? 
+
+Super, when included in an instance method, will search up the method lookup path to find a method that is the same name as the one it has been included in and invoke it. 
+
+If super if left without any parenthesis, it will automatically pass any arguements passed to the original instance method up the method lookup path to the method it is looking to invoke. This may cause unintended consequences. 
+
+### Example:
+```ruby
+class Vehicle
+  attr_reader :model
+
+  def initialize(model)
+    @model = model
+  end
+end
+
+class Car < Vehicle
+  def initialize(colour)
+    super # => super autmatically passes up the argument to the #initialize higher in the inheritence hierachy.
+    @colour = colour
+  end
+end
+
+astra = Car.new('red')
+p astra # => #<Car:0x00005610f1387b58 @model="red", @colour="red">
+```
+
+We can indicate to `super`, not to pass any arguments up inheritence hierarchy by including an empty parenthesis.
+
+### Example:
+```ruby
+class Vehicle
+  attr_reader :model
+  
+  def initialize
+    @model = nil
+  end
+end
+
+class Car < Vehicle
+  def initialize(colour)
+    super() # => No argument is passed up the inheritence hierarchy but the initialize method is still invoked.
+    @colour = colour
+  end
+end
+
+astra = Car.new('red')
+p astra # => #<Car:0x00005610f1387b58 @model="nil", @colour="red">
+```
+
+We can also include arugments within the parenthesis which can be passed up to the method higher in the inheritence hierachy. 
+
+### Example:
+
+```ruby
+class Vehicle
+  attr_reader :model
+  
+  def initialize(model)
+    @model = model
+  end
+end
+
+class Car < Vehicle
+  def initialize(model, colour)
+    super(model) # => No argument is passed up the inheritence hierarchy but the initialize method is still invoked.
+    @colour = colour
+  end
+end
+
+astra = Car.new('astra', 'red')
+p astra # => #<Car:0x0000558b73596ad8 @model="astra", @colour="red">
+```
+
+
 
 ## Class Variables
 
