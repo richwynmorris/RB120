@@ -704,8 +704,6 @@ astra = Car.new('astra', 'red')
 p astra # => #<Car:0x0000558b73596ad8 @model="astra", @colour="red">
 ```
 
-
-
 ## Class Variables
 
 Class variables are distinctive in the fact that they are prepended with the `@@` symbols. 
@@ -735,7 +733,7 @@ end
 test = MyClass.new
 test.display_class_variable
 SuperClass.class_method
-test.display_class_variable
+test.display_class_variable # => uninitialized class variable @@class_variable in SuperClass
 ```
 
 ### Example 2:
@@ -764,6 +762,8 @@ test.display_class_variable
 MyClass.class_method
 test.display_class_variable
 ```
+
+Moreover, class variable is loaded when it is evaluated by Ruby. Therefore, the class variable comes into existence as soon as the class is defined.
 
 ### Practical Case Use for Class Variables
 
