@@ -532,11 +532,98 @@ vauxhall.change_total_cars  = 4 # instance of the class reassigns the value of @
 p CarManufactorer.display_total_cars # => 4 - The @@total_cars variable is changed in the class itself. 
 ```
 
+## Class Methods
+
+class methods are only available to class itself and not instances of the class.
+
+class methods are defined by using the reserved word `self` prior to naming a method. `self` when refered to in the context of the body of the class, and not within an instance method, refers to the class itself. Therefore, the class can directly invoke the class method. 
+
+class methods are scoped at the level of the class and have access to class variables.
+
+#### Example of class methods in action:
+
+```ruby
+class CarManufactorer
+  @@total_cars = 0
+
+  def self.produce_astra # CLASS METHOD
+    Car.new('Astra')
+    @@total_cars += 1
+  end
+
+  def self.display_total_cars #CLASS METHOD
+    @@total_cars
+  end
+end
+
+class Car
+  def initialize(model)
+    @model = model
+  end
+end
+
+2.times do 
+  CarManufactorer.produce_astra # CLASS METHOD INVOKED BY CLASS
+end
+
+p CarManufactorer.display_total_cars # => CLASS METHOD INVOKED BY CLASS.
+```
+
+## Method Lookup Path
+
+The method lookup path is the path that ruby takes when it a method is invoked on an object. 
+
+The method lookup path will begin searching by looking in the calling object. It will then traverse the superclasses and included modules until it either finds the method and invokes it or it returns an exception with the no method error message.
+
+In regards to included modules, the method lookup path will search the class first and then its included modules. If there are a number of included modules, it will check them in the reverse order with which they were included. 
+
+We can find out what the methodlookup path is on a object by calling the ancestors class method on the class itself.
+
+All classes inherit from BasicObject.
 
 
+## Method Overiding
+
+Method overiding is the ability to overide a method contained in a superclass, from a subclass. This allows us to achieve the concept of polymorphism in our code.
+
+We can overide both custom methods and built-in ruby methods within our own custom classes. 
+
+### Example of overiding the `to_s` method:
+
+```ruby
+class Person
+  def initialize(name)
+    @name = name
+  end
+
+  def to_s
+    "Hello, my name is #{@name}!"
+  end
+end
+
+joe = Person.new('Joe')
+
+puts joe # => Overides the built-in 'to_s' with custom 'to_s' method and prints "Hello, my name is Joe!"
+```
+
+Method overiding can be useful but it can also be problematic when we accidentally overide a method that we may be trying to invoke from the `Object` class. 
+
+```ruby
+class Dog
+  def bark
+    puts 'woof!'
+  end
+
+  def send
+    "I'll go get the ball!"
+  end
+end
 
 
+hudson = Dog.new
 
+hudson.send :bark # => Wrong number of arguements, expected 0, got 1.
+```
 
 
 
