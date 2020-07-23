@@ -821,6 +821,108 @@ LondonBus.what_colour_am_i # I am a London bus and I am the colour red.
 
 ## Collaborator Objects
 
+- collaborator objects are objects that exist as states within objects.
+- A collaborator can be any object type. Therefore, a string object being assigned to an instance variable is technically a collaborator objects.
+- collaborator objects have a relationship of association.
+- collaborator objects can create dependencies which can cause problems later if the instance varible or collaborator object is modified. 
+
+####Example:
+```ruby
+class Person
+  attr_reader :pet
+  
+  def initialize(name, pet)
+    @name = name
+    @pet = pet
+  end
+end
+
+class Pet
+  def bark
+    puts 'woof!'
+  end
+end
+
+hudson = Pet.new
+kimberley = Person.new('Kimberley', hudson)
+kimberley.pet.bark # => 'woof!'
+```
+
+## Self
+- `self` is a reserved word which changes dependent on the context it is included in.
+- `self` when used in the body of a class refers to the class itself.
+- `self` when used within the scope of an instance method refers to the object itself.
+- We typically use `self` to define class methods or in conjuction with setter methods when calling them from within an object.
+- `self` represents the calling object and as a result, will not work with `private` in some instances.
+
+```ruby
+class ExampleClass
+  def initialize(random)
+    @random = random
+  end
+
+  def my_random_instace_method
+    self
+  end
+
+  def self.what_is_this
+    self
+  end
+
+  def to_s
+    "I'm super random!"
+  end
+end
+
+random = ExampleClass.new('hello')
+puts random.my_random_instace_method # => "I'm super random!"
+puts ExampleClass.what_is_this # => ExampleClass
+```
+
+## Super
+- `super` is a reserved word that, when read, has ruby search up the method lookup path to find the method of the same name higher in the inheritence hierarchy. When it finds it, it will invoke it.
+- This a a form of polymorphism as it allows us to extend the functionality of our methods.
+- `super` will pass all arguments that are included in the original method invocation up the inheritence hierarchy unless you explicitly state that no arguments should be passed up using an empty parenthesis. 
+
+```ruby
+class Animal
+  def initialize(name)
+    @name = name
+  end
+end
+
+class Dog < Animal
+  def initialize(name, fur)
+    super(name)
+    @fur = fur
+  end
+end
+```
+## #initialize && #new
+
+ #initialize is a method is automatically called everytime an object is instantiated from a class. This is also known as a constructor method. 
+
+ #new is a method that is called on the class itself and returns an new object from that class
+
+## #to_s
+
+- The #to_s method is built into all objects. 
+- The #to_s method is often over ridden by different classes to return a custom repsonse.
+- The #to_s method is automatically called by the `puts` method.
+- If there is not custom #to_s method, it will return a string representation of the object and its data.
+
+
+## Benefits of OOP
+- Allows the programmer to organise thier code hierarchically.
+- Allows the programmer to create greater levels of abstraction and complexity
+- Removes the unreliability of using dependencies.
+- Easier to identify and locate bugs in the program
+- Allows us to achieve the DRY principle more effectively in our program
+- Uses objects and accessor methods to only expose data that is needed. 
+
+
+
+
 
 
 
