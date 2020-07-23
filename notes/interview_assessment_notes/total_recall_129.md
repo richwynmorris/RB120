@@ -625,5 +625,203 @@ hudson = Dog.new
 hudson.send :bark # => Wrong number of arguements, expected 0, got 1.
 ```
 
+## Accesssor Methods
+
+Accessor Methods are our way of exposising or modifying data contained within an object. Accessor methods allow us to use the public interface of the object to interact with the existing code base. We can use custom accessor methods or use the built in methods. 
+
+#### Custom Getter and Setter
+
+```ruby
+class Animal
+  def initialize(name)
+    @name = name
+  end
+
+  def get_name # => custom getter methods
+    @name
+  end
+
+  def set_name=(name) # => custom setter method
+    @name = name
+  end
+end
+```
+
+
+#### Using Ruby built in accessor methods
+```ruby
+class Animal
+  attr_reader :name
+  attr_writer :name
+
+  # OR
+
+  attr_accessor :name
+
+  def initialize(name)
+    @name = name
+  end
+end
+```
+attribute accessor methods use a symbol as a paramater that points towards the instance variable of the same name.
+
+When we want to call an attribute accessor method within the scope of the object or another instance method, we need to prepend the attr_* method with the reserved word `self` otherwise ruby will interpret the method call for initialization of a new local variable that's being assigned a new value.
+
+accessor methods can be used either inside the class or outside the class, so long as they are public.
+
+
+## Private, Public and Protected
+- access modifiers change the ability of where the method can be called from.
+- `private` and `protected` are method calls.
+- `private` means it can only be called within the scope of the object, not accessible outside of the object
+- `private` methods cannot call `self` on themselves, unless they are using a setter method. 
+- `protected` works like `private` as in you can't call the method from outside the object, but works like `public` in the sense that you can call in side the object.
+- we primarily use `protected` methods when we want to share data between two instances of the same class.
+
+#### Example of Public Method:
+
+```ruby
+class Dog
+  def initialize(name, fur)
+    @name = name
+    @fur = fur
+  end
+
+  def bark
+    puts 'woof!'
+  end
+end
+
+hudson = Dog.new('Hudson', 'chocolate brown')
+hudson.bark # => public method is available outside of the object
+```
+
+#### Example of Private Method:
+```ruby
+class Dog
+  def initialize(name, fur)
+    @name = name
+    @fur = fur
+  end
+
+  def bark
+    puts 'woof!'
+  end
+
+  def display_fur
+    puts "#{@name} has #{fur}  fur"
+  end
+
+  private
+
+  attr_reader :fur
+end
+
+hudson = Dog.new('Hudson', 'chocolate brown')
+hudson.display_fur # => Hudson has chocolate brown fur.
+hudson.fur # => calling private method
+```
+
+#### Example of Protected Method:
+
+```ruby
+class Dog
+  def initialize(name, fur, age)
+    @name = name
+    @fur = fur
+    @age = age
+  end
+
+  def bark
+    puts 'woof!'
+  end
+
+  def display_fur
+    puts "#{@name} has #{fur}  fur"
+  end
+
+  def compare_age(other)
+    age == other.age
+  end
+
+  protected
+
+  attr_reader :age
+
+  private
+
+  attr_reader :fur
+end
+
+hudson = Dog.new('Hudson', 'Chocolate brown', 3)
+sally  = Dog.new('Sally', 'Golden', 3)
+
+p hudson.compare_age(sally) # => true
+```
+
+### Constants
+
+- Constants are variables that are not meant to change state or value
+- They are defined at the lexical level, meaning they are scoped at the level they are defined.
+- Ruby searches for constants in runtime, meaning it will search the calling object first before moving up the inheritence hierarchy to find it. 
+- There can be occasions where a constant will be defined in an external module or class. In these instances, we need to use the namespace resolution operator to indicate to ruby where to search for the constant.
+
+#### Example:
+```ruby
+module Colour
+  MY_CONSTANT_COLOUR = 'red'
+end
+
+class LondonBus
+  def display_visual_info
+    puts "A london bus is traditionally painted #{Colour::MY_CONSTANT_COLOUR}."
+  end
+end
+
+london_bus = LondonBus.new.display_visual_info
+```
+
+- constants can be reassigned with a new value but ruby will throw and exception to warn you that the constant has been changed.
+- constants can be inherited down the inheritence hierarchy.
+
+```ruby
+class Bus
+  COLOUR = 'red'
+end
+
+class LondonBus < Bus
+  def display_visual_info
+    puts "A london bus is traditionally painted #{COLOUR}."
+  end
+end
+
+london_bus = LondonBus.new.display_visual_info
+```
+
+- constants are available to both instance methods and class methods
+
+### Example:
+```ruby
+class LondonBus < Bus
+  
+  COLOUR = 'red'
+  
+  def display_visual_info
+    puts "A london bus is traditionally painted #{COLOUR}."
+  end
+  
+  def self.what_colour_am_i
+    puts "I am a London bus and I am the colour #{COLOUR}."
+  end
+end
+
+london_bus = LondonBus.new.display_visual_info # => A london bus is traditionally painted red.
+LondonBus.what_colour_am_i # I am a London bus and I am the colour red.
+```
+
+## Collaborator Objects
+
+
+
 
 
